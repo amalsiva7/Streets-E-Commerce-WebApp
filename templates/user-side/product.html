@@ -1,0 +1,262 @@
+{% extends "user-side/base-footer.html" %}
+
+{% load static %}
+
+{% block title %}Products{% endblock title %}
+
+{% block content %}
+<section class="bg0 p-t-23 p-b-140" style="background-color: white;">
+    <div class="container">
+        <div class="p-b-25">
+            <!-- <h3 class="ltext-103 cl5">
+                Product Overview
+            </h3> -->
+        </div>
+
+        <div class="flex-w flex-sb-m p-b-52">
+            <div class="flex-w flex-l-m filter-tope-group m-tb-10">
+                <button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5 how-active1" data-filter="*">
+                    All Products
+                </button>
+                <!-- 
+                <button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5" data-filter=".women">
+                    Women
+                </button>
+
+                <button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5" data-filter=".men">
+                    Men
+                </button> -->
+
+            </div>
+
+            <div class="flex-w flex-c-m m-tb-10">
+                <div class="flex-c-m stext-106 cl6 size-104 bor4 pointer hov-btn3 trans-04 m-r-8 m-tb-4 js-show-filter">
+                    <i class="icon-filter cl2 m-r-6 fs-15 trans-04 zmdi zmdi-filter-list"></i>
+                    <i class="icon-close-filter cl2 m-r-6 fs-15 trans-04 zmdi zmdi-close dis-none"></i>
+                    Filter
+                </div>
+
+                <div class="flex-c-m stext-106 cl6 size-105 bor4 pointer hov-btn3 trans-04 m-tb-4 js-show-search">
+                    <i class="icon-search cl2 m-r-6 fs-15 trans-04 zmdi zmdi-search"></i>
+                    <i class="icon-close-search cl2 m-r-6 fs-15 trans-04 zmdi zmdi-close dis-none"></i>
+                    Search
+                </div>
+            </div>
+
+            <!-- Search product -->
+            <div class="dis-none panel-search w-full p-t-10 p-b-15">
+                <form method="GET" action="{% url 'user_side:product_page' %}">
+                    <div class="bor8 dis-flex p-l-15">
+                        <button type="submit" class="size-113 flex-c-m fs-16 cl2 hov-cl1 trans-04">
+                            <i class="zmdi zmdi-search"></i>
+                        </button>
+
+                        <input class="mtext-107 cl2 size-114 plh2 p-r-15" type="text" name="search_product" placeholder="Search" value="{{ request.GET.search_product }}">
+                    </div>
+                    <div id="suggestions-container" class="suggestions-container"></div>
+                </form>
+            </div>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const searchInput = document.querySelector(".size-114");
+                    const suggestionsContainer = document.getElementById("suggestions-container");
+
+                    searchInput.addEventListener("input", function () {
+                        const userInput = searchInput.value;
+                        if (userInput.trim() !== "") {
+                            // Make an API request to get suggestions
+                            fetch(`/get-names/?search=${userInput}`)
+                                .then((response) => response.json())
+                                .then((data) => {
+                                    const suggestions = data.payload;
+
+                                    // Clear previous suggestions
+                                    suggestionsContainer.innerHTML = "";
+
+                                    // Display the new suggestions
+                                    suggestions.forEach((suggestion) => {
+                                        const suggestionElement = document.createElement("div");
+                                        suggestionElement.textContent = suggestion.name;
+                                        suggestionElement.classList.add("suggestion");
+
+                                        // Handle click on a suggestion
+                                        suggestionElement.addEventListener("click", function () {
+                                            searchInput.value = suggestion.name;
+                                            suggestionsContainer.innerHTML = "";
+                                        });
+
+                                        suggestionsContainer.appendChild(suggestionElement);
+                                    });
+                                })
+                                .catch((error) => {
+                                    console.error("Error fetching suggestions: ", error);
+                                });
+                        } else {
+                            suggestionsContainer.innerHTML = ""; // Clear suggestions if input is empty
+                        }
+                    });
+
+                    // Close the suggestions dropdown if the user clicks outside of it
+                    document.addEventListener("click", function (event) {
+                        if (!suggestionsContainer.contains(event.target) && event.target !== searchInput) {
+                            suggestionsContainer.innerHTML = "";
+                        }
+                    });
+                });
+            </script>
+
+            <!-- Filter -->
+            <div class="dis-none panel-filter w-full p-t-10">
+                <div class="wrap-filter flex-w bg6 w-full p-lr-40 p-t-27 p-lr-15-sm">
+                    <div class="filter-col1 p-r-15 p-b-27">
+                        <div class="mtext-102 cl2 p-b-15">
+                            CATEGORY
+                        </div>
+
+                        <ul>
+
+                            {% for subcategory in subcategory_data %}
+                            <li class="p-b-6">
+                                <a href="{% url 'user_side:filtered_products_by_category' category_slug=subcategory.name|slugify %}" class="filter-link stext-106 trans-04">
+                                    {{ subcategory.name }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        
+
+
+                            <li class="p-b-6">
+                                <a href="{% url 'user_side:sort_product' sort_by='low_to_high' %}" class="filter-link stext-106 trans-04">
+                                    Price: Low to High
+                                </a>
+                            </li>
+
+                            <li class="p-b-6">
+                                <a href="{% url 'user_side:sort_product' sort_by='high_to_low' %}" class="filter-link stext-106 trans-04">
+                                    Price: High to Low
+                                </a>
+                            </li>
+                            <li class="p-b-6">
+                                <a href="{% url 'user_side:sort_product' sort_by='new_arrivals' %}" class="filter-link stext-106 trans-04">
+                                    New Arrivals
+                                </a>
+                            </li>
+                            <li class="p-b-6">
+                                <a href="{% url 'user_side:sort_product' sort_by='aA_to_zZ' %}" class="filter-link stext-106 trans-04">
+                                    aA to zZ
+                                </a>
+                            </li>
+                            <li class="p-b-6">
+                                <a href="{% url 'user_side:sort_product' sort_by='zZ_to_aA' %}" class="filter-link stext-106 trans-04">
+                                    zZ to aA
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="filter-col2 p-r-15 p-b-27">
+                        <div class="mtext-102 cl2 p-b-15">
+                            Price
+                        </div>
+
+                        <ul>
+                            <li class="p-b-6">
+                                <a href="{% url 'user_side:product_page' %}" class="filter-link stext-106 trans-04 filter-link-active">
+                                    All
+                                </a>
+                            </li>
+
+                            <li class="p-b-6">
+                                <a href="{% url 'user_side:filtered_products_by_price'  price_range='500-1000' %}" class="filter-link stext-106 trans-04">
+                                    &#x20B9;500.00 - &#x20B9;1000.00
+                                </a>
+                            </li>
+                            <li class="p-b-6">
+                                <a href="{% url 'user_side:filtered_products_by_price'  price_range='1000-1500' %}" class="filter-link stext-106 trans-04">
+                                    &#x20B9;1000.00 - &#x20B9;1500.00
+                                </a>
+                            </li>
+
+                            <li class="p-b-6">
+                                <a href="{% url 'user_side:filtered_products_by_price'  price_range='1500-2000' %}" class="filter-link stext-106 trans-04">
+                                    &#x20B9;1500.00 - &#x20B9;2000.00
+                                </a>
+                            </li>
+
+                            <li class="p-b-6">
+                                <a href="{% url 'user_side:filtered_products_by_price'  price_range='2000-2500' %}" class="filter-link stext-106 trans-04">
+                                    &#x20B9;2000.00 - &#x20B9;2500.00
+                                </a>
+                            </li>
+
+                            <li class="p-b-6">
+                                <a href="{% url 'user_side:filtered_products_by_price'  price_range='2500-3000' %}" class="filter-link stext-106 trans-04">
+                                    &#x20B9;2500.00 - &#x20B9;3000.00
+                                </a>
+                            </li>
+
+                            <li class="p-b-6">
+                                <a href="{% url 'user_side:filtered_products_by_price'  price_range='3000-10000' %}" class="filter-link stext-106 trans-04">
+                                    &#x20B9;3000.00+
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+        <!-- -------------------------------------------product--------------------------------------------- -->
+
+        <div class="row isotope-grid">
+            {% for product in products %}
+
+
+
+            <div class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item women">
+                <!-- Block2 -->
+                <div class="block2">
+                    <div class="block2-pic hov-img0">
+                         <a href="{% url 'user_side:product_detail' product.product_id %}">
+                            <img src="{{product.image.url}}" alt="IMG-PRODUCT">
+                        </a>
+
+                    </div>
+
+                    <div class="block2-txt flex-w flex-t p-t-14">
+                        <a href="{% url 'user_side:product_detail' product.product_id %}" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6"> 
+                            {{product.product_name}}
+                        </a>
+                        <div class="block2-txt-child1 flex-col-l ">
+                            
+                            {% if product.price == product.rprice %}
+                            <span class="stext-105 cl3">
+                                &#x20B9;{{product.price}}
+                            </span>
+                            {% else %}
+                            <span class="stext-105 cl3">
+                                &#x20B9;{{product.price}}
+                            </span>
+                            {% comment %} <del>&#x20B9;{{product.rprice}}</del> {% endcomment %}
+                            {% endif %}
+                        </div>
+                        {% if  request.user.is_authenticated %}
+                        <div class="block2-txt-child2 flex-r p-t-3">
+                            <a href="" class="btn-addwish-b2 dis-block pos-relative ">
+                                <img class="icon-heart1 dis-block trans-04" src="" alt="ICON">
+                                <img class="icon-heart2 dis-block trans-04 ab-t-l" src="" alt="ICON">
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% endfor %}
+        </div>
+</section>
+
+
+{% endblock content %}

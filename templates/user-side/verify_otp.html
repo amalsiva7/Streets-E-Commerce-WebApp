@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OTP Verification</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- alterify -->
+
+<!-- CSS -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+<!-- Default theme -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
+<style>
+    .red-text {
+        color: red;
+    }
+</style>
+</head>
+<body style="background-color: #FF7F50;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h1 class="mt-5 mb-4">OTP Verification</h1>
+                <form method="post" class="mb-5">
+                    {% csrf_token %}
+                    <p>Enter the OTP sent to your email:</p>
+                    <div class="form-group">
+                        <label for="otp">OTP:</label>
+                        <input type="text" name="otp" class="form-control" required>
+                        <p id="timer">Time remaining: <span id="countdown">60</span> seconds</p>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Verify OTP</button>
+                </form>
+                
+                <a id="resend-link" style="display: none;" href="{% url 'user_side:resend_otp' %}">Resend OTP</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function startTimer(duration, display) {
+            var timer = duration, seconds;
+    
+            var countdown = setInterval(function () {
+                seconds = parseInt(timer % 60, 10);
+    
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+    
+                var timeText = "00:" + seconds;
+                display.textContent = timeText;
+    
+                if (timer < 10) {
+                    display.classList.add("red-text");
+                }
+    
+                if (--timer < 0) {
+                    clearInterval(countdown);
+                    // Handle timer expiration here (e.g., show Resend OTP link)
+                    document.getElementById("resend-link").style.display = "block";
+                }
+            }, 1000);
+        }
+    
+        window.onload = function () {
+            var thirtySeconds = 60;
+            var display = document.querySelector('#timer');
+            startTimer(thirtySeconds, display);
+        };
+    </script>
+    
+    
+
+    <!-- Include Bootstrap JS (Optional) -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- altertify -->
+
+	<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+	<script>
+		alertify.set('notifier','position', 'top-center');
+		{% for msg in messages %}
+	
+			alertify.success('{{msg}}');
+		{%endfor%}
+		 
+	</script>
+</body>
+</html>

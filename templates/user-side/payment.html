@@ -1,0 +1,183 @@
+{% extends "user-side/base-log-sign.html" %}
+{% load static %}
+
+{% block content %}
+<h4 class="text-center mb-10">Review Your Order and Make Payment</h4>
+<form class="bg0 p-t-75 p-b-85" method="POST" action="">
+    {% csrf_token %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 col-xl-7 m-lr-auto m-b-50">
+                <div class="m-l-25 m-r--38 m-lr-0-xl">
+                    <div class="wrap-table-shopping-cart">
+                        <div class="card">
+                            <h5 class="card-header">Billing Address</h5>
+                            <div class="card-body">
+                                <p class="card-text mb-0">{{ order.full_name }}</p>
+                                <p class="card-text mb-0">{{ order.full_address }}</p>
+                                <p class="card-text mb-0">{{ order.city }}, {{ order.state }}</p>
+                                <p class="card-text mb-0">{{ order.country }}</p>
+                                <p class="card-text mb-0">{{ order.pincode }}</p>
+                                <p class="card-text mb-0">{{ order.email }}</p>
+                                <p class="card-text mb-0">{{ order.phone }}</p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h5 class="card-header">Review Products</h5>
+                            <div class="card-body">
+                                <table class="table-shopping-cart">
+                                    <tr class="table_head">
+                                        <th class="column-1">Product</th>
+                                        <th class="column-2"></th>
+                                        <th class="column-3">Price</th>
+                                        <th class="column-4">Quantity</th>
+                                        <th class="column-5">Total</th>
+                                    </tr>
+                                    {% for cart_item in cart_items %}
+                                    <tr class="table_row">
+                                        <td class="column-1">
+                                            <div class="how-itemcart1">
+                                                <img src="{{ cart_item.product.image.url }}" alt="IMG">
+                                            </div>
+                                        </td>
+                                        <td class="column-2">
+                                            <a href="{% url 'user_side:product_detail' product_id=cart_item.product.product_id %}" style="font-size: 13px; color: black;">
+                                                {{ cart_item.product.product_name }}
+                                            </a>
+                                        </td>
+                                        <td class="column-3">&#x20B9;{{ cart_item.product.price }}</td>
+                                        <td class="column-4" style="text-align: center;">
+                                            <label for="">{{ cart_item.quantity }}</label>
+                                        </td>
+                                        <td class="column-5">&#x20B9;{{ cart_item.sub_total }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-10 col-lg-7 col-xl-5 m-lr-auto m-b-50">
+                <div class="bor10 p-lr-40 p-t-30 p-b-40 m-l-63 m-r-40 m-lr-0-xl p-lr-15-sm">
+                    <h4 class="mtext-109 cl2 p-b-30">Cart Totals</h4>
+                    <div class="flex-w flex-t bor12 p-b-13">
+                        <div class="size-208">
+                            <span class="stext-110 cl2">Total Price:</span>
+                        </div>
+                        <div class="size-209">
+                            <span class="mtext-110 cl2">&#x20B9;{{ total }}</span>
+                        </div>
+                        <div class="size-208" style="margin-top: 15px;">
+                            <span class="stext-110 cl2">Tax:</span>
+                        </div>
+                        <div class="size-209" style="margin-top: 15px;">
+                            <span class="mtext-110 cl2">&#x20B9;{{ tax }}</span>
+                        </div>
+                        <div class="size-208" style="margin-top: 15px;">
+                            <span class="stext-110 cl2">Coupon Discount:</span>
+                        </div>
+                        <div class="size-209" style="margin-top: 15px;">
+                            <span class="mtext-110 cl2" name="discount">&#x20B9;{{ coupon_discount }}</span>
+                        </div>
+                    </div>
+                    <div class="flex-w flex-t p-t-27 p-b-33">
+                        <div class="size-208">
+                            <span class="mtext-101 cl2">Grand Total:</span>
+                        </div>
+                        <div class="size-209 p-t-1">
+                            <span class="mtext-110 cl2">&#x20B9;{{ grand_total }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Apply Coupon -->
+     
+    <script>
+        const couponInput = document.getElementById('couponInput');
+        const couponList = document.getElementById('couponList');
+        const applyCouponButton = document.getElementById('applyCouponButton');
+
+        couponInput.addEventListener('focus', function() {
+            couponList.style.display = 'block';
+        });
+
+        couponInput.addEventListener('blur', function() {
+            setTimeout(() => {
+                couponList.style.display = 'none';
+            }, 200); // Delay to allow time for the click event on the coupon list
+        });
+
+        const couponItems = couponList.querySelectorAll('.dropdown-item');
+        couponItems.forEach(function(item) {
+            item.addEventListener('click', function(event) {
+                event.preventDefault();
+                const selectedCoupon = this.getAttribute('data-coupon');
+                couponInput.value = selectedCoupon;
+                couponList.style.display = 'none';
+            });
+        });
+
+        applyCouponButton.addEventListener('click', function() {
+            // Apply the coupon logic here using the value from couponInput
+            const selectedCouponCode = couponInput.value;
+            // ... Add your coupon application logic ...
+        });
+    </script>
+
+    <input type="hidden" id="coupon-discount" value="0">
+
+    <a href="" id="payWithWalletBtn" class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5" style="background-color: #FF7F50;" onclick="return confirm('Are you sure you want to pay with wallet?')">
+      Pay with Wallet
+  </a>
+  
+  <a href="{% url 'user_side:pay_with_cash_on_delivery' order.id %}" id="payWithWalletBtn" class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5" style="background-color: #FF7F50;" onclick="return confirm('Are you sure you want to pay with cash on delivery?')">
+      Cash on Delivery
+  </a>
+  
+</form>
+
+<script>
+    var payment_method = 'Paypal'
+    var discount = "{{ coupon_discount }}"
+    var grandTotal = parseFloat("{{ grand_total }}") * 100;
+    var options = {
+        "key": "rzp_test_xvSCaam6lRoeDa", // Enter the Key ID generated from the Dashboard
+        "amount": grandTotal, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        "currency": "INR",
+        "name": "fKart",
+        "description": "Purchases",
+        "image": "https://example.com/your_logo",
+        "payment_id": "{{ payment.id }}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+        "handler": function(response) {
+            // alert(response.razorpay_payment_id);
+            // alert(response.razorpay_order_id);
+            // alert(response.razorpay_signature)
+            console.log(response)
+            window.location.href = `/payment/payments/?order_id={{ order.order_number }}&method=RAZORPAY&payment_id=${response.razorpay_payment_id}&payment_order_id=${response.razorpay_order_id}&payment_sign=${response.razorpay_signature}&status=COMPLETED & discount={{ coupon_discount }}`
+        },
+
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    rzp1.on('payment.failed', function(response) {
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+    });
+    document.getElementById('rzp-button1').onclick = function(e) {
+        rzp1.open();
+        e.preventDefault();
+    }
+</script>
+
+
+{% endblock content %}

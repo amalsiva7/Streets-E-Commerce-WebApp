@@ -1,0 +1,35 @@
+{% extends "user-side/base-footer.html" %}
+{% load static %}
+
+{% block title %}User Profile{% endblock title %}
+
+{% block content %}
+  
+<body style="background-color: #FF7F50;">
+  <div class="form-container col-lg-4" style="margin-top: 100px;margin-bottom: 100px;">
+    <h1 class="text-center mb-4">Edit Profile</h1>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="full_name">First Name</label>
+        <input type="text" class="form-control" id="full_name" name="first_name" value="{{ user_profile.name }}">
+      </div>
+      <div class="form-group">
+        <label for="full_name">Last Name</label>
+        <input type="text" class="form-control" id="full_name" name="last_name" value="{{ user_profile.name }}">
+      </div>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" class="form-control" id="username" name="username" value="{{ user_profile.user.username }}">
+      </div>
+      <div class="form-group">
+        <label for="mobile">Mobile</label>
+        <input type="text" class="form-control" id="mobile" name="mobile" value="{{ user_profile.mobile }}">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
+    </form>
+  </div>
+</body>
+
+
+{% endblock content %}

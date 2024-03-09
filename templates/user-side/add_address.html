@@ -1,0 +1,141 @@
+{% extends "user-side/base-footer.html" %}
+{% load static %}
+
+{% block title %}Address{% endblock title %}
+
+
+
+{% block content %}
+<body>
+  <div class="container mt-4" >
+		<div class="row justify-content-center">
+			<div class="col-lg-8" style="margin-top:60px; margin-bottom:60px;">
+				<div class="card">
+					<div class="card-header">
+						<h1 class="mb-0">Add Address</h1>
+					</div>
+					<div class="card-body">
+						<form id="address-form" method="post">
+							{% csrf_token %}
+
+							{% if error_message %}
+                  <div class="alert alert-danger" role="alert">
+										{{ error_message }}
+									</div>
+							{% endif %}
+
+
+							<div class="form-row">
+								<div class="form-group col-md-6">
+									<label for="first_name">First Name</label>
+									<input type="text" class="form-control" id="first_name" name="first_name" required>
+								</div>
+								   <div class="form-group col-md-6">
+									<label for="last_name">Last Name</label>
+									<input type="text" class="form-control" id="last_name" name="last_name" required>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="phone">Phone</label>
+								<input type="text" class="form-control" id="phone" name="phone" required>
+								<div class="invalid-feedback" id="phone-error">Please enter a valid phone number.</div>
+							</div>
+							<div class="form-group">
+								<label for="email">Email</label>
+								<input type="email" class="form-control" id="email" name="email" required>
+							</div>
+							<div class="form-group">
+								<label for="address_line_1">Address Line 1</label>
+								<input type="text" class="form-control" id="address_line_1" name="address_line_1" required>
+							</div>
+							<div class="form-group">
+								<label for="address_line_2">Address Line 2</label>
+								<input type="text" class="form-control" id="address_line_2" name="address_line_2">
+							</div>
+							<div class="form-group">
+								<label for="city">City</label>
+								<input type="text" class="form-control" id="city" name="city" required>
+							</div>
+							<div class="form-row">
+								<div class="form-group col-md-6">
+									<label for="state">State</label>
+									<input type="text" class="form-control" id="state" name="state" required>
+								</div>
+								<div class="form-group col-md-6">
+									<label for="country">Country</label>
+									<input type="text" class="form-control" id="country" name="country" required>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="pincode">Pincode</label>
+								<input type="text" class="form-control" id="pincode" name="pincode" pattern="\d{6}" required>
+						</div>
+							<button type="submit" class="btn btn-primary" id="submit-button">Save Address</button>
+						</form>
+						<div class="text-center">
+							<a href="{% url 'user_side:address_page' %}" class="btn btn-link">Back to Address Page</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<script>
+		const pincodeInput = document.getElementById('pincode');
+		const pincodeError = document.getElementById('pincode-error');
+		const phoneInput = document.getElementById('phone');
+		const phoneError = document.getElementById('phone-error');
+		const firstNameInput = document.getElementById('first_name');
+		const lastNameInput = document.getElementById('last_name');
+		const emailInput = document.getElementById('email');
+	
+		const submitButton = document.getElementById('submit-button');
+		submitButton.addEventListener('click', function(event) {
+			event.preventDefault();
+	
+			// Validate First Name and Last Name (Ensure they are strings)
+			const firstNameValue = firstNameInput.value;
+			const lastNameValue = lastNameInput.value;
+			const nameRegex = /^[a-zA-Z]+$/;
+			if (!nameRegex.test(firstNameValue) || !nameRegex.test(lastNameValue)) {
+				// Display an error if either field contains non-alphabetic characters
+				// and prevent form submission.
+				alert('First name and last name should contain only alphabetic characters.');
+				return;
+			}
+	
+			// Validate Phone Number (Exactly 10 digits and not a repeated pattern)
+			const phoneValue = phoneInput.value;
+			if (
+				phoneValue.length !== 10 ||
+				!/^\d+$/.test(phoneValue) ||
+				/^(.)\1+$/.test(phoneValue)
+			) {
+				phoneError.style.display = 'block';
+				phoneInput.classList.add('is-invalid');
+			} else {
+				phoneError.style.display = 'none';
+				phoneInput.classList.remove('is-invalid');
+			}
+	
+			// Validate Email
+			const emailValue = emailInput.value;
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			if (!emailRegex.test(emailValue)) {
+				// Display an error if the email is not in a valid format.
+				alert('Please enter a valid email address.');
+				return;
+			}
+	
+			if (!phoneInput.classList.contains('is-invalid')) {
+				document.getElementById('address-form').submit();
+			}
+		});
+	</script>
+	<!-- Include Bootstrap JS (Optional) -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+  
+{% endblock content %}

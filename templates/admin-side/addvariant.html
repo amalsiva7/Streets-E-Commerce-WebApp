@@ -1,0 +1,122 @@
+{% extends 'admin-side/admindashboard.html' %}
+{% load static %}
+
+{% block title %}Add variant{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title" style="margin-top: 70px;">
+                        {% if variant_id %}
+                            Edit Variant
+                        {% else %}
+                            Add Variant
+                        {% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" action="{% if variant_id %}{% url 'product_side:edit-variant' variant_id %}{% else %}{% url 'product_side:add-variant' %}{% endif %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="product">Product</label>
+                            {{ form.product }}
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-6">
+                                <label for="{{ form.size.id_for_label }}">Size</label>
+                                {{ form.size }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.stock.id_for_label }}">Stock</label>
+                            {{ form.stock }}
+                            <label for="{{ form.is_active.id_for_label }}">Is Active</label>
+                            {{ form.is_active }}
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">
+                                {% if variant_id %}Update{% else %}Add{% endif %}
+                            </button>
+                            <a href="{% url 'product_side:variant-list' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Function to initialize the Cropper.js instance for image cropping
+    function initImageCropper() {
+        const imageInput = document.getElementById('id_images');
+        const imagePreview = document.getElementById('image-preview');
+        const cropButton = document.getElementById('crop-button');
+      
+        imageInput.addEventListener('change', function (e) {
+          const file = e.target.files[0];
+      
+          if (!file) return;
+      
+          const reader = new FileReader();
+      
+          reader.onload = function () {
+            const img = new Image();
+            img.src = reader.result;
+      
+            img.onload = function () {
+              // Clear previous previews and append the new one
+              imagePreview.innerHTML = '';
+              imagePreview.appendChild(img);
+      
+              // Initialize Cropper.js
+              const cropper = new Cropper(img, {
+                aspectRatio: 1, // Set the aspect ratio for cropping
+                viewMode: 1,
+                guides: true,
+                background: false,
+                autoCropArea: 0.8,
+                responsive: true,
+              });
+      
+              // Show the crop button after image loaded
+              cropButton.style.display = 'block';
+      
+              // Attach event listener to crop button
+              cropButton.addEventListener('click', function () {
+                // Get cropped canvas and convert it to blob
+                const croppedCanvas = cropper.getCroppedCanvas();
+                croppedCanvas.toBlob(function (blob) {
+                  // Create a new image element to preview the cropped image
+                  const croppedImg = new Image();
+                  croppedImg.src = URL.createObjectURL(blob);
+      
+                  // Set the size of the preview image
+                  croppedImg.style.width = '840px';
+                  croppedImg.style.height = '840px';
+      
+                  // Clear previous previews and append the new one
+                  imagePreview.innerHTML = '';
+                  imagePreview.appendChild(croppedImg);
+
+                  // Update the hidden field with the cropped image data
+                  const croppedImageInput = document.getElementById('cropped-image');
+                  croppedImageInput.value = blob;
+                });
+              });
+            };
+          };
+      
+          reader.readAsDataURL(file);
+        });
+      }
+      
+      // Call the function to initialize the image cropper
+      initImageCropper();
+</script>
+
+{% endblock %}

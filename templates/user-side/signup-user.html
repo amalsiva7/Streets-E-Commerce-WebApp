@@ -1,0 +1,86 @@
+{% extends "user-side/base-log-sign.html" %}
+
+{% block content %}
+    {% block scripts %}
+        <script>
+            // JavaScript function to display message popup
+            function showMessagePopup(message) {
+                alert(message); // Change this to use a modal for better styling
+            }
+        </script>
+        {% if messages %}
+            {% for message in messages %}
+                <script>
+                    showMessagePopup("{{ message }}");
+                </script>
+            {% endfor %}
+        {% endif %}
+    {% endblock %}
+
+    <section class="vh-100 gradient-custom" style="background-color: #FFFF00;">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                    <div class="card bg-dark text-white" style="border-radius: 1rem;">
+                        <div class="card-body p-5">
+                            <div class="mb-md-5 mt-md-4 pb-5">
+                                <h2 class="fw-bold mb-2 text-uppercase text-center">Create an account</h2>
+                                <form method="post" action="{% url 'user_side:signup' %}">
+                                    {% csrf_token %}
+                                    <div class="form-outline form-white mb-4">
+                                        <label class="form-label" for="form3Example1cg">Enter your name</label>
+                                        <input type="text" id="form3Example1cg" name="user" class="form-control form-control-lg" required />
+                                        
+                                    </div>
+                                    <div class="form-outline form-white mb-4">
+                                        <label class="form-label" for="form3Example3cg">Email</label>
+                                        <input type="email" id="form3Example3cg" name="email" class="form-control form-control-lg" required />
+                                        
+                                    </div>
+                                    <div class="form-outline form-white mb-4">
+                                        <label class="form-label" for="form3Example3cg">Phone number</label>
+                                        <input type="tel" id="form3Example3cg" name="phone" class="form-control form-control-lg" required />
+                                        
+                                    </div>
+                                    <div class="form-outline form-white mb-4">
+                                        <label class="form-label" for="form3Example4cg">Password</label>
+                                        <input type="password" id="form3Example4cg" name="pass1" class="form-control form-control-lg" required />
+                                        <small id="passwordHelpBlock" class="form-text text-muted">
+                                          Your password should be 8-20 characters long, contain at least one number, one uppercase letter, and one lowercase letter.
+                                        </small>
+                                        
+                                    </div>
+                                    <div class="form-outline form-white mb-4">
+                                        <label class="form-label" for="form3Example4cdg">Repeat your password</label>
+                                        <input type="password" id="form3Example4cdg" name="pass2" class="form-control form-control-lg" required />
+                                        
+                                    </div>
+                                    <script>
+                                        function validatePassword() {
+                                            var password = document.getElementById("form3Example4cg").value;
+                                            var confirmPassword = document.getElementById("form3Example4cdg").value;
+                                            if (password != confirmPassword) {
+                                                showMessagePopup("Passwords do not match.");
+                                                return false;
+                                            }
+                                            var regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+                                            if (!regex.test(password)) {
+                                                showMessagePopup("Password must contain at least one lowercase letter, one uppercase letter, one number, one special character, and be at least 8 characters long.");
+                                                return false;
+                                            }
+                                            return true;
+                                        }
+                                    </script>
+                                    <div class="d-flex justify-content-center">
+                                        <button type="submit" class="btn btn-outline-light btn-lg px-5" onclick="return validatePassword()">Register</button>
+                                    </div>
+                                    <p class="text-center text-muted mt-5 mb-0">Have already an account? <a href="{% url 'user_side:userlogin' %}" class="fw-bold text-white"><u>Login here</u></a></p>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}

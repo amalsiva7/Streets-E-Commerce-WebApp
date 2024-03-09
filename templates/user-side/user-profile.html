@@ -1,0 +1,54 @@
+{% extends "user-side/base-footer.html" %}
+{% load static %}
+
+{% block title %}User Profile{% endblock title %}
+
+{% block content %}
+
+<body style="background-color: #FF7F50;">
+  {% comment %} Add your Bootstrap-based HTML layout for the user profile page {% endcomment %}
+  <div class="container mt-4 mb-4">
+    <div class="row" style="margin-top: 150px; margin-bottom: 350px;">
+      {% comment %} Left column for other details {% endcomment %}
+      <div class="col-md-4">
+        <h3 style="margin-bottom: 40px; color:black">Welcome, {{ user.username }}</h3>
+        {% comment %}  Sidebar navigation {% endcomment %}
+        <ul class="list-group" >
+          <li class="list-group-item list-group-item-action" style="background-color: #2f2f2f;";"><a href="{% url 'user_side:edit_profile' %}">Edit Profile</a></li>
+          <li class="list-group-item list-group-item-action" style="background-color: #2f2f2f;";"><a href="{% url 'user_side:address_page' %}">Address</a></li>
+          <li class="list-group-item list-group-item-action" style="background-color: #2f2f2f;";"><a href="{% url 'user_side:change_password' %}">Change Password</a></li>
+          <li class="list-group-item list-group-item-action" style="background-color: #2f2f2f;";"><a href=" {% url 'user_side:order_history' %}">My Orders</a></li>
+          <li class="list-group-item list-group-item-action" style="background-color: #2f2f2f;";"><a href=" ">Wallet</a></li>
+          
+        </ul>
+      </div>
+
+      {% comment %}  Right column for user details {% endcomment %}
+      <div class="col-md-8" style="margin-top: 44px;">
+        
+
+        {% comment %} Display user details using Bootstrap list group {% endcomment %}
+        <ul class="list-group mt-4" >
+          <li class="list-group-item" style="background-color: #2f2f2f; color: white">
+            <h5 class="mb-1">Full Name</h5>
+            <p class="mb-0">{{ user.first_name }} {{ user.last_name }}</p>
+          </li>
+
+          <li class="list-group-item" style="background-color: #2f2f2f; color: white">
+            <h5 class="mb-1">Username</h5>
+            <p class="mb-0">{{ user.username }}</p>
+          </li>
+          <li class="list-group-item" style="background-color: #2f2f2f; color: white">
+            <h5 class="mb-1">Email</h5>
+            <p class="mb-0">{{ user.email }}</p>
+          </li>
+          <li class="list-group-item" style="background-color: #2f2f2f; color: white">
+            <h5 class="mb-1">Mobile</h5>
+            <p class="mb-0">{{ user.phone_number }}</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}

@@ -1,0 +1,232 @@
+{% extends "user-side/base-log-sign.html" %}
+
+{% block title %}shopping Cart{% endblock title %}
+
+{% block content %}
+<div class="container " style="margin-top: 150px; margin-bottom: 350px;">
+    {% if not cart_items %}
+    <div id="inside-div">
+        <h2 class="text-center">Your Shopping Cart is Empty</h2>
+        <br>
+        <div class="text-center">
+            <a href="{% url 'user_side:index-page' %}" class="btn btn-primary">Continue Shopping</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="row ">
+        <div class="col-lg-10 col-xl-7 m-lr-auto m-b-50">
+            <div class="m-l-25 m-r--38 m-lr-0-xl">
+                <div class="wrap-table-shopping-cart">
+                    <table class="table-shopping-cart">
+                        <tr class="table_head">
+                            <th class="column-1">Product</th>
+                            <th class="column-2"></th>
+                            <th class="column-3">Price</th>
+                            <th class="column-4">Quantity</th>
+                            <th class="column-5">Total</th>
+                        </tr>
+                        {% for cart_item in cart_items %}
+                        <tr class="table_row  product_data" >
+                            <td class="column-1">
+                                <div class="how-itemcart1">
+                                    <img src="{{ cart_item.product.image.url }}" alt="IMG">
+                                </div>
+                            </td>
+                            <td class="column-2">
+                                <a href="" style="font-size: 13px; color: black;">
+                                    {{ cart_item.product.product_name }}
+                                </a>
+                                <p class="text-muted small">
+                                    {{cart_item.variations}}
+                                </p>
+                            </td>
+                            <td class="column-3">&#x20B9; {{ cart_item.product.price }}</td>
+                            <td class="column-4">
+                                {% csrf_token %}
+                                <div class="input-group input-spinner">
+                                    <input type="hidden" value="{{cart_item.product.product_id}}" id="product_id">
+                                    <input type="hidden" value=" {{forloop.counter}}" id="item_counter">
+                                    <input type="hidden" value="{{cart_item.id}} " id="cart_id">
+                                    <div class="input-group-prepend">
+                                        <button class="btn btn-light button-minus" type="button" id="button-minus"><i class="fa fa-minus"></i></button> 
+                                    </div>
+                                    <input type="text" class="form-control txt-center qty"   value="{{ cart_item.quantity }}">
+                                    <div class="input-group-append">
+                                        <a href="" class="btn btn-light button-plus" type="button" id="button-plus"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="column-5 sub_total" >&#x20B9; {{ cart_item.sub_total }} </td>
+                            <td class="column-6">
+                                <a href="{% url 'cart:remove_cart_item' product_id=cart_item.product_id  cart_item_id=cart_item.id %}"  " class="btn btn-danger btn-sm">Remove</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-10 col-lg-7 col-xl-5 m-lr-auto m-b-50">
+            <div class="bor10 p-lr-40 p-t-30 p-b-40 m-l-63 m-r-40 m-lr-0-xl p-lr-15-sm">
+                <h4 class="mtext-109 cl2 p-b-30">
+                    Cart Totals
+                </h4>
+                <div class="flex-w flex-t bor12 p-b-13">
+                    <div class="size-208">
+                        <span class="stext-110 cl2">
+                            Total Price:
+                        </span>
+                    </div>
+                    <div class="size-209">
+                        <span class="mtext-110 cl2 total">
+                            &#x20B9;{{total}}
+                        </span>
+                    </div>
+                    <div class="size-208" style="margin-top: 15px;">
+                        <span class="stext-110 cl2 ">
+                            Tax:
+                        </span>
+                    </div>
+                    <div class="size-209" style="margin-top: 15px;">
+                        <span class="mtext-110 cl2 tax">
+                            &#x20B9;{{ tax }}
+                        </span>
+                    </div>
+                </div>
+                <div class="flex-w flex-t p-t-27 p-b-33">
+                    <div class="size-208">
+                        <span class="mtext-101 cl2">
+                            Grand Total:
+                        </span>
+                    </div>
+                    <div class="size-209 p-t-1">
+                        <span class="mtext-110 cl2 grand_total">
+                            &#x20B9;{{ grand_total}}
+                        </span>
+                    </div>
+                </div>
+                <a href="{% url 'user_side:checkout' %}" class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15 trans-04 pointer">
+                    Proceed to Checkout
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+
+
+<script>
+	$(document).ready(function() {
+		var token = $('input[name=csrfmiddlewaretoken]').val();
+	
+		// Handle button clicks
+		$('.button-plus').click(function (e) {
+			e.preventDefault();
+	
+			// Get the product ID, cart item ID, and quantity from the DOM
+			var productId = $(this).closest('tr').find('#product_id').val();
+			var itemCounter = parseInt($(this).closest('tr').find('#item_counter').val(), 10); // Convert to integer
+			var cartItemId = $(this).closest('tr').find('#cart_id').val();
+			var qtyInput = $(this).closest('.product_data').find('.qty');
+			var subTotalField = $(this).closest('tr').find('td.sub_total');
+		// var sub_total=$(this).closest('.product_data').find('.sub_total');
+		 // Target the input field for quantity
+	
+			// Make an AJAX request to update the cart item quantity
+			$.ajax({
+					method: "POST",
+					url: "{% url 'cart:newcart_update' %}",
+					data: {
+							'product_id': productId,
+							'cart_id': cartItemId,
+							'qty': qtyInput.val(),
+							'counter': itemCounter,
+							'csrfmiddlewaretoken': token
+					},
+					success: function (response) {
+							if (response.status === "success") {
+									// Update the displayed quantity
+									qtyInput.val(response.new_quantity);
+					// sub_total.text("₹" + response.sub_total)
+	
+									// Update the subtotal for this specific cart item
+									subTotalField.html("₹" + response.sub_total);
+					
+									// Update total, grand total, and tax as needed
+									$('.total').text("₹" + response.total);
+									$('.grand_total').text("₹" + response.grand_total);
+									$('.tax').text("₹" + response.tax);
+							}else if(response.status === "error"){
+	
+					alert(response.message);
+				}
+					},
+					error: function (xhr, status, error) {
+							console.log(xhr.responseText);
+				
+					}
+			});
+	});
+	
+	
+		$('.button-minus').click(function(e) {
+			e.preventDefault();
+	
+			// Get the product ID, cart item ID, and quantity from the DOM
+			var productId = $(this).closest('tr').find('#product_id').val();
+			var itemCounter = parseInt($(this).closest('tr').find('#item_counter').val(), 10); // Convert to integer
+			var cartItemId = $(this).closest('tr').find('#cart_id').val();
+			var qtyInput = $(this).closest('.product_data').find('.qty'); // Target the input field for quantity
+			var subTotalField = $(this).closest('tr').find('td.sub_total');
+	
+			// Enable the quantity input field
+		 
+	
+			// Make an AJAX request to remove the cart item
+			$.ajax({
+				method: "POST",
+				url: "{% url 'cart:remove_cart_item_fully' %}",
+				data: {
+					'product_id': productId,
+							'cart_id': cartItemId,
+							'qty': qtyInput.val(),
+							'counter': itemCounter,
+							'csrfmiddlewaretoken': token
+				},
+				success: function(response) {
+					if (response.status === "success") {
+						// Update the displayed quantity
+					//   $(this).closest('.product_data').find('#qty').val(response.new_quantity)
+			qtyInput.val(response.new_quantity);
+			//   document.getElementById('sub_total').innerHTML ="₹" +response.sub_total;
+			subTotalField.html("₹" + response.sub_total);
+	
+	
+	
+	
+						$('.total').text("₹"+response.total)
+						$('.grand_total').text("₹"+response.grand_total)
+						$('.tax').text("₹"+response.tax)
+			//   $('.sub_total').text("₹"+response.sub_total)
+						
+					} else {
+	
+				location.reload();
+				alert(response.message);
+						// Handle error cases here
+					}
+				},
+				error: function(xhr, status, error) {
+					console.log(xhr.responseText);
+				}
+			});
+		});
+	
+	});
+	
+	
+		</script>
+
+
+{% endblock content %}

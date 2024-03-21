@@ -43,12 +43,19 @@ def add_brand(request):
     if not request.user.is_authenticated:
         return redirect('admin_side:adminlogin')
     
-    if request.method=='POST':
-        brand_name=request.POST['brand_name']
-        brands=Brand(brand_name=brand_name)
-        brands.save()   
-        return redirect('product_side:brandlist')    
+    if request.method == 'POST':
+        brand_name = request.POST.get('brand_name')
+        if brand_name:  # Check if brand_name is not empty
+            brand = Brand.objects.create(brand_name=brand_name)
+            return redirect('product_side:brandlist')
+        else:
+            # If brand_name is empty, display an error message or handle it as needed
+            # For example, you can add a message to the context and render the form again
+            context = {'error_message': 'Brand name cannot be empty'}
+            return render(request, 'admin-side/addbrand.html', context)
+    
     return render(request, 'admin-side/addbrand.html')
+
 
 
 
@@ -106,10 +113,8 @@ def product_list(request):
 @login_required(login_url='admin_side:adminlogin')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_product(request):
-    
     if not request.user.is_authenticated:
         return redirect('admin_side:adminlogin')
-    
 
     categories = Category.objects.all()
     brands = Brand.objects.all()
@@ -124,19 +129,33 @@ def add_product(request):
         images = request.FILES.getlist('images[]')
         stock = request.POST.get('stock')
         
-        brand = Brand.objects.get(id = brand_id)
-        category = Category.objects.get(pk=category_id)
-        cropped_image_data = request.POST.get('cropped_image')
+        # Perform validation checks
+        if not all([product_id, product_name, category_id, description, price, brand_id, images, stock]):
+            messages.error(request, "Please fill in all the fields.")
+            return redirect('product_side:add_product')
         
-        
-        product = Product(product_id=product_id,product_name=product_name, description=description,category=category, price=price,brand=brand)
-        product.image=images[0]#cropped_image_data#images[0]
-        product.save()
-        
-        for i in range(len(images)):
-            prd_image = ProductImage(product=product,image=images[i])
+        try:
+            brand = Brand.objects.get(id=brand_id)
+            category = Category.objects.get(pk=category_id)
+
+            # Attempt to create a new product
+            product = Product(product_name=product_name, product_id=product_id, description=description, 
+                              category=category, price=price, brand=brand)
+            product.image = images[0]
+            product.save()
             
-        return redirect('product_side:productlist')
+            # Save additional product images
+            for img in images:
+                prd_image = ProductImage(product=product, image=img)
+                prd_image.save()
+            
+            messages.success(request, 'Product added successfully.')
+            return redirect('product_side:productlist')
+        
+        except Exception as e:
+            messages.error(request, str(e))
+            return redirect('product_side:add_product')
+
     else:
         form = AddProductForm()
         
@@ -146,6 +165,7 @@ def add_product(request):
         'brand': brands,
     }
     return render(request,'admin-side/addproduct.html',context)
+
 
 
 @login_required(login_url='admin_side:adminlogin')

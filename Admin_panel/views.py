@@ -1,4 +1,3 @@
-from django.shortcuts import render,HttpResponse,redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.views.decorators.cache import cache_control
@@ -12,6 +11,8 @@ from django.views.decorators.csrf import csrf_protect
 from django.urls import reverse
 from User_Authentication.models import *
 from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
+from django.http import HttpResponseBadRequest
+
 
 # Create your views here.
 #####################SUPER ADMIN REQUIRED####################
@@ -35,7 +36,10 @@ def adminlogin(request):
     if request.method == "POST":
         email = request.POST['email']
         password = request.POST['password']
+        
+        print(email, password)
         user = authenticate(request, email=email, password=password)
+        print("user",user)
         if user:
             if user.is_superadmin:
                 login(request, user)
@@ -67,7 +71,6 @@ def adminlogout(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def userlist(request):
     
-    print("ulil keryeee***************************************************************")
     if not request.user.is_authenticated:
         return redirect('admin_side:adminlogin')
     
@@ -77,7 +80,7 @@ def userlist(request):
     if search_query:
         users = Account.objects.filter(username__icontains=search_query)
     else:
-        users = Account.objects.all()
+        users = Account.objects.all().order_by('-date_joined')
 
     context = {
         'users': users
@@ -108,3 +111,52 @@ def block_unblock_user(request, user_id):
         
 
     return redirect('admin_side:userlist')
+
+
+@login_required(login_url='admin_side:adminlogin')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def order_list(request):
+    if not request.user.is_authenticated:
+        return redirect('admin_side:adminlogin')
+    
+    orders = Order.objects.all().order_by('-created_at')
+    context = {'orders':orders}
+    return render(request,'admin-side/orderlist.html',context)
+
+
+@login_required(login_url='admin_side:adminlogin')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def ordered_product_details(request,order_id):
+    if not request.user.is_authenticated:
+        return redirect('admin_side:adminlogin')
+    
+    order = Order.objects.get(id=order_id)
+    ordered_products = OrderProduct.objects.filter(order=order)
+    
+    total = 0
+    
+    for ordered_product in ordered_products:
+        total += ordered_product.product_price
+        
+    context = {
+        'order':order,
+        'ordered_products':ordered_products,
+        'total': total,
+    }
+    return render(request,'admin-side/ordered_product_details.html',context)
+
+
+@login_required(login_url='admin_side:adminlogin')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def update_order_status(request,order_id):
+    if not request.user.is_authenticated:
+        return redirect('admin_side:adminlogin')
+    
+    if request.method == 'POST':
+        order = get_object_or_404(Order, id=int(order_id))
+        status = request.POST['status']
+        order.status = status
+        order.save()
+        return redirect('admin_side:order_list')
+    else:
+        return HttpResponseBadRequest("Bad request.")

@@ -18,6 +18,8 @@ urlpatterns = [
   path('product_page/price/<str:price_range>/', views.product_page, name='filtered_products_by_price'),
   path('product_page/sort/<str:sort_by>/', views.product_page, name='sort_product'),
   path('product_detail/<int:product_id>/', views.product_detail, name='product_detail'),
+  path('stock_check', views.stock_check, name='stock_check'),
+  
   
   
   path('user_profile',views.user_profile,name='user_profile'),

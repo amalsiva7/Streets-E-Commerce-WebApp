@@ -45,11 +45,15 @@ def add_category(request):
     if request.method == 'POST':
         category_name = request.POST.get('category_name')
 
-        category = Category(category_name=category_name)
-        category.save()
-        
-        return redirect('category_side:categorylist')
-    
+        if category_name:  # Check if category_name is not empty
+            category = Category(category_name=category_name)
+            category.save()
+            messages.success(request, 'Category added successfully.')
+            return redirect('category_side:categorylist')
+        else:
+            messages.error(request, 'Category name cannot be empty.')
+            return redirect('category_side:add-category')  # Redirect back to the form page
+
     return render(request, 'admin-side/addcategory.html')
 
 

@@ -17,7 +17,8 @@ from cart.models import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import AddressBook
 from .forms import AddressForm
-
+from django.http import JsonResponse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Create your views here.
 
@@ -281,22 +282,69 @@ def product_page(request, category_slug=None, price_range=None,sort_by=None):
     }
     return render(request,'user-side/product.html',context)
 
+
+def stock_check(request):
+    variant = request.POST.get('variant')
+    product_id = request.POST.get('product')
+    
+    product_variant = get_object_or_404(ProductVariant, product_id=product_id, size=variant)
+    product = get_object_or_404(Product, pk=product_id)
+    
+    context = {
+        'product_id': product_id,
+        'product_name': product.product_name,
+        'price': product.price,
+        'description': product.description,
+        'selected_size': variant,
+        'stock': product_variant.stock
+    }
+    
+    return JsonResponse(context)
+
+   
+
+
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def product_detail(request, product_id):
+    
+    variant = request.POST.get('variant')
+    product = request.POST.get('product')
+    
+    stocks = None
+
+    
+    try:
+        products_data = ProductVariant.objects.get(product_id=product, size=variant)
+        
+        stocks = products_data.stock
+    except:
+        pass
+    
+   
     products = get_object_or_404(Product, pk=product_id)
     product_variants = ProductVariant.objects.filter(product=products)
     selected_size = request.GET.get('size')  # Get the selected size from the query parameters
     if selected_size:
         product_variants = product_variants.filter(size=selected_size)
+        
+    print("ssssssssssssssssssssssssstttttttttttttttttttt:", stocks)
     context = {
         'products': products,# product details
         'product_variants': product_variants, # varients
-        'selected_size': selected_size # size
+        'selected_size': selected_size, # size
+        'stock':stocks
     }
     print("++++++++++++++++++++")
     print(context)
-    return render(request, 'user-side/product-detail.html', context)
-
+    if request.headers.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+        # If the request is AJAX, return a JSON response with the context data
+        print("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
+        return JsonResponse({'success': True, 'context': context})
+    else:
+        print("lllllllllllllllllllllllllllllllllll")
+        # If the request is not AJAX, render the template as usual
+        return render(request, 'user-side/blu.html', context)
+    
 
 
 ################################ USER PROFILE  ################################
@@ -524,15 +572,6 @@ def checkout(request, total=0, quantity=0, cart_items=None):
         else:
             pass
 
-
-        # variant = cart_items.variations
-        # if variant.stock >= 1:
-        #     variant.stock -= cart_items.quantity
-        #     variant.save()
-        # else:
-        #     print("Not enough stock!")
-
-
         for cart_item in cart_items:
             total += (cart_item.product.price * cart_item.quantity)
             quantity += cart_item.quantity
@@ -547,19 +586,7 @@ def checkout(request, total=0, quantity=0, cart_items=None):
                 pass
 
         tax = (2 * total) / 100
-
-        # Check if a coupon is applied
-        # applied_coupon = request.session.get('coupon_id')
-        # if applied_coupon:
-        #     coupon = Coupon.objects.get(id=applied_coupon)
-        #     coupon_discount = coupon.discount_amount
-        # applied_coupon = request.session['coupon_code']
-        # # print('********applied_coupon*********', applied_coupon)
-        # if applied_coupon:
-        #     coupon = Coupon.objects.get(coupon_code=applied_coupon)
-        #     print('*********coupon***********',coupon)
-        #     coupon_discount = coupon.discount_amount
-        #     print('**********coupon_discount**********', coupon_discount)
+            
 
         grand_total = total + tax  # Apply coupon discount to grand_total
 
@@ -569,7 +596,6 @@ def checkout(request, total=0, quantity=0, cart_items=None):
 
     address_list = AddressBook.objects.filter(user=request.user)
     default_address = address_list.filter(is_default=True).first()
-    # coupons = Coupon.objects.all()
     context = {
         'total': total,
         'quantity': quantity,
@@ -578,9 +604,7 @@ def checkout(request, total=0, quantity=0, cart_items=None):
         'grand_total': grand_total,
         'address_list': address_list,
         'default_address': default_address,  # Pass the default address to the context
-        # 'coupons': coupons,
-        # 'applied_coupon': applied_coupon,
-        # 'coupon_discount':coupon_discount
+        
     }
     return render(request, 'user-side/checkout.html', context)
 
@@ -718,8 +742,9 @@ def pay_with_cash_on_delivery(request, order_id):
     cart_items = CartItem.objects.filter(user=request.user)
 
     for item in cart_items:
+        if item.variations.stock >= item.quantity:  # Check if there is sufficient stock
             orderproduct = OrderProduct()
-            item.variations.stock-=item.quantity
+            item.variations.stock -= item.quantity
             item.variations.save()
             orderproduct.order_id = order.id
             orderproduct.payment = payment
@@ -730,6 +755,11 @@ def pay_with_cash_on_delivery(request, order_id):
             orderproduct.ordered = True
             orderproduct.size = item.variations.size
             orderproduct.save()
+        else:
+            # If stock is insufficient, display message and remove item from cart
+            messages.error(request, f"Oops! Item '{item.product.product_name}' is sold out.")
+            item.delete()
+            
 
 
     # Clear the cart (adjust this based on your project structure)
@@ -771,13 +801,31 @@ def pay_with_cash_on_delivery(request, order_id):
 @login_required(login_url='user_side:userlogin')
 def order_history(request):
     if not request.user.is_authenticated:
-        return redirect('user_side:index-page')
+        return redirect('user_side:user_login')
+
+    # Assuming Order.objects.all() returns all orders
+    all_orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
+
+    # Number of orders to display per page
+    per_page = 5
+
+    paginator = Paginator(all_orders, per_page)
     
-    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
+    page_number = request.GET.get('page')
+    try:
+        orders = paginator.page(page_number)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        orders = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        orders = paginator.page(paginator.num_pages)
+
     context = {
         'orders': orders,
     }
     return render(request, 'user-side/order_history.html', context)
+
 
 
 @login_required(login_url='user_side:userlogin')

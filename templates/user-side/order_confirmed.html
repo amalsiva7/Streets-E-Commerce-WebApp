@@ -63,12 +63,12 @@
                       {% for item in ordered_products %}
                       <tr>
                         <td>{{item.product.product_name}}
-                          <p class="text-muted small">
-                            ({{item.size}})
+                          <p>
+                            Size:({{item.size}})
                           </p>
                         </td>
                         <td class="text-center">{{item.quantity}}</td>
-                        <td class="text-center">₹{{item.product_price}} </td>
+                        <td class="text-center">&#x20B9;{{item.product_price}} </td>
                       </tr>
                       {% endfor %}
                     </tbody>
@@ -111,15 +111,27 @@
 <script>
   function printInvoice() {
     // Hide other elements on the page
-    document.querySelector('.container-1').style.display = 'none';
-    document.querySelector('.row-printable').style.display = 'none';
-    document.querySelector('.invoice-footer').style.display = 'none';
+    var elementsToHide = document.querySelectorAll('.container-1, .invoice-footer');
+    elementsToHide.forEach(function(element) {
+      element.style.display = 'none';
+    });
+
+    // Print only the content inside the row invoice row-printable div
+    var contentToPrint = document.querySelector('.row-printable').innerHTML;
+    var originalContent = document.body.innerHTML;
+    document.body.innerHTML = contentToPrint;
+
+    // Print the page
     window.print();
-  
-    // Show other elements again after printing is done
-    document.querySelector('.container-1').style.display = 'block';
-    document.querySelector('.row-printable').style.display = 'block';
-    document.querySelector('.invoice-footer').style.display = 'block';
+
+    // Restore the original content after printing
+    document.body.innerHTML = originalContent;
+
+    // Show hidden elements again
+    elementsToHide.forEach(function(element) {
+      element.style.display = 'block';
+    });
   }
-  </script>
+</script>
+
 {% endblock content %}

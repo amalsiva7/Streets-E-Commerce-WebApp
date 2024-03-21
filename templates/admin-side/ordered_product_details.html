@@ -1,0 +1,74 @@
+{% extends 'admin-side/admindashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+  <h1>Ordered Product Details for Order ID: {{ order.order_number }}</h1>
+  <div class="table-responsive">
+      <table class="table table-striped table-bordered">
+          <thead class="thead-dark">
+              <tr>
+                  <th>Order ID</th>
+                  <th>User name</th>
+                  <th>Email</th>
+                  <th>Address</th>
+                  <th>Product Name</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  
+                  
+                  
+
+                   <!-- Add a header for the total price column -->
+              </tr>
+          </thead>
+          <tbody>
+              {% for ordered_product in ordered_products %}
+              <tr>
+                  {% if forloop.first %}
+                  <!-- Display the Order ID only once for the first product -->
+                  <td rowspan="{{ ordered_products.count }}">{{ order.order_number }}</td>
+                  <td rowspan="{{ ordered_products.count }}">{{ order.first_name }}  {{ order.last_name }}</td>
+                  <td rowspan="{{ ordered_products.count }}">{{ order.email }}</td>
+                  <td rowspan="{{ ordered_products.count }}">{{ order.address_line_1 }},<br>{{ order.address_line_2 }},<br>{{ order.city}},<br>{{ order.state }},<br>{{ order.pincode }}</td>
+
+                  {% endif %}
+                  <td>{{ ordered_product.product.product_name }}</td>
+                  <td>{{ ordered_product.quantity }}</td>
+                  <td>&#x20B9;{{ ordered_product.product_price }}</td>
+                  <!-- Add other order product-related data as needed -->
+                  
+              </tr>
+              {% endfor %}
+              <!-- Calculate the total price using the custom filter -->
+              
+              <tr>
+                  <td colspan="6" class="text-right">Tax:</td>
+                  <td>&#x20B9;{{ order.tax}}</td>
+              </tr>
+              <tr>
+                  <td colspan="6" class="text-right">Grand total:</td>
+                  <td>&#x20B9;{{ order.order_total}}</td>
+              </tr>
+          </tbody>
+      </table>
+  </div>
+
+  <form action="{%url 'admin_side:update_order_status' order_id=order.id%}" method="post">
+      {% csrf_token %}
+      <div class="input-group">
+      <select name="status" class="form-group" name="status">
+          {% for status_value, status_label in order.STATUS %}
+              <option value="{{ status_value }}" {% if order.status == status_value %}selected{% endif %}>{{ status_label }}</option>
+          {% endfor %}
+      </select>
+      
+      <button class="btn btn-primary" type="submit"> Apply</button>
+      </div>
+  </form>
+
+  
+
+
+</div>
+{% endblock content %}

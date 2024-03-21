@@ -47,17 +47,13 @@ def cart(request, total=0, quantity=0, cart_items=None):
 
 def add_cart(request, product_id): 
     size = request.GET.get('size')
-
-    print(size,"**********************************************************")
-    
     product = Product.objects.get(product_id=product_id)
     
     try:
         variant = ProductVariant.objects.get(product=product, size=size)
-        print(variant)
     except ProductVariant.DoesNotExist:
         messages.warning(request, 'variation not available, please select another variation')
-        return HttpResponseRedirect(reverse('user:product-detail', args=(product_id,)))
+        return HttpResponseRedirect(reverse('user_side:product_detail', args=(product_id,)))
         
     if variant is not None:  # Check if variant was found
         if variant.stock >= 1:
@@ -66,11 +62,12 @@ def add_cart(request, product_id):
                     is_cart_item_exists = CartItem.objects.filter(
                         user=request.user, product=product,
                         variations=variant).exists()
-                    print(is_cart_item_exists)
+        
                 except CartItem.DoesNotExist:
                     pass 
-
+                  
                 if is_cart_item_exists:
+                    
                     to_cart = CartItem.objects.get(user=request.user, product=product, variations=variant)
                     variation = to_cart.variations
                     if to_cart.quantity < variation.stock:
@@ -90,22 +87,11 @@ def add_cart(request, product_id):
                     # to_cart.variations.set([variant])  
                 return redirect('cart:shopping_cart')
             else:
-                # try:
-                #     cart = Cart.objects.get(cart_id=_cart_id(request))
-                # except Cart.DoesNotExist:
-                #     cart = Cart.objects.create(cart_id=_cart_id(request))
-                
-                # is_cart_item_exists = CartItem.objects.filter(cart=cart, product=product, variations=variant).exists()
-                # if is_cart_item_exists:
-                #     to_cart = CartItem.objects.get(cart=cart, product=product, variations=variant)
-                #     to_cart.quantity += 1
-                # else:
-                #     to_cart = CartItem(cart=cart, product=product, quantity=1)
-                # # to_cart.variations.set([variant])  # Use set() to manage the many-to-many relationship
-                # to_cart.save()
+
                 messages.success(request, "please login to purchase")
                 return redirect('user_side:userlogin')
         else:
+          
             messages.warning(request, 'This item is out of stock.')
             return redirect('user:product-detail', product_id)
     else:
@@ -219,7 +205,6 @@ def newcart_update(request):
             return JsonResponse({'status': 'error', 'message': 'Cart item not found'})
         
         if cart_item.variations:
-            print('hjsgfgfhghjfg')
             print(cart_item.variations)
             variation = cart_item.variations  # Access the variation associated with the cart item
             if cart_item.quantity < variation.stock:
@@ -232,7 +217,7 @@ def newcart_update(request):
                 new_quantity = cart_item.quantity
             else:
                 message = "out of stock"
-                return JsonResponse({'status': 'error', 'message': message})      
+                return JsonResponse({'status': 'error', 'message': message}) 
         for cart_item in cart_items:
             total += (cart_item.product.price * cart_item.quantity)
             quantity += cart_item.quantity
@@ -241,7 +226,6 @@ def newcart_update(request):
         print(new_quantity,total,tax,grand_total,sub_total)       
         # Handle variations as needed
         
-
     if new_quantity ==0:
         message = "out of stock"
         return JsonResponse({'status': 'error', 'message': message})

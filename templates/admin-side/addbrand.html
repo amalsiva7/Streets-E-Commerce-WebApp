@@ -1,9 +1,7 @@
 {% extends 'admin-side/admindashboard.html' %}
 {% load static %}
 
-
-{% block title %}Brands{% endblock title %}
-
+{% block title %}Add Brand{% endblock title %}
 
 {% block content %}
 <div class="container">
@@ -17,9 +15,14 @@
                     <form method="post" enctype="multipart/form-data" action="{% url 'product_side:add_brand' %}">
                         {% csrf_token %}
                         <div class="d-flex flex-column align-items-center"> <!-- Center the form -->
+                            {% if error_message %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ error_message }}
+                            </div>
+                            {% endif %}
                             <div class="mb-3">
-                                <label for="{{ form.name.id_for_label }}">Brand Name</label>
-                                <input type="text" class="form-control" id="brand_name" name="brand_name" >
+                                <label for="brand_name">Brand Name</label>
+                                <input type="text" class="form-control" id="brand_name" name="brand_name">
                             </div>
 
                             <div class="mb-3">

@@ -27,12 +27,23 @@ class Product(models.Model):
     def __str__(self):
         return self.product_name
     
+    def save(self, *args, **kwargs):
+        if self.pk is None:  # Only execute if the product is being created (not updated)
+            last_product_id = Product.objects.order_by('-product_id').first()
+            if last_product_id:
+                self.product_id = last_product_id.product_id + 1  # Increment the product_id
+            else:
+                self.product_id = 1000  # Start from 1000 if no products exist yet
+        if int(self.price) < 0:
+            raise ValueError("Price cannot be negative.")
+        super().save(*args, **kwargs)
+    
     
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name = 'images')
     image = models.ImageField('photos/product')
     
-    def ___str__(self):
+    def __str__(self):
         if self.product:
             return f"Product: {self.product.brand},{self.product.category}"
         else:
@@ -64,4 +75,5 @@ class ProductVariant(models.Model):
     objects = VariationManager()
     
     def __str__(self):
-        return f"{self.product.product_name}, Size: {self.size}" 
+        return f"{self.product.product_name}, Size: {self.size}"
+    

@@ -1,0 +1,165 @@
+{% extends 'admin-side/admindashboard.html' %}
+{% load static %}
+
+{% block title %}Add Coupon{% endblock title %}
+
+{% block content %}
+<section class="content-main">
+  <div class="content-header">
+    <div>
+      <h2 class="content-title card-title"> Add Coupon</h2>
+      
+    </div>
+    <div>
+      <a type="button" class="btn btn btn-primary" href="{% url 'coupon:view_coupon' %}">Go Back</a>
+    </div>
+  </div>
+
+  <!-- FORM FOR ADD NEW CATEGORY -->
+  <div class="card">
+    <div class="card-body">
+      <div class="container mt-4">
+        <h4>Add New Coupon</h4>
+        <hr>
+        <form method="post" action="{% url 'coupon:add_coupon' %}" id="add-coupon-form">
+          {% csrf_token %}
+          <div class="">
+            <div class="container">
+              <div class="row row-cols-2">
+                <div class="col p-3">
+                  <label for="minimum-amount"><span>Minimum Amount</span></label><br>
+                  <input class="form-control border border-dark rounded" id="minimum-amount" name="minimumamount"
+                         type="number" placeholder="Minimum Amount Eligible for discount" value="{{ minimumAmount }}"
+                         min="0"> <!-- Added min="0" to restrict the input from going below zero -->
+              
+                  <span id="amount-span" style="color:red;"></span>
+                </div>
+              
+              
+                <div class="col p-3">
+                  <label for="discount"><span>Discount (in percentage)</span></label><br>
+                  <input class="form-control border border-dark rounded" type="number" id="discount" name="discount"
+                         placeholder="Discount" value="{{ NewCoupon.discount }}" min="0"> <!-- Added min="0" -->
+              
+                  <span id="discount-span" style="color:red;"></span>   
+                </div>
+              
+               
+                <div class="col p-3" >
+                  <label for="expiry-date"><span>Expiry Date</span></label> <br>
+                  <input class="form-control border border-dark rounded text-center" style="cursor:pointer;" type="date" id="expiry-date"
+                         name="expirydate" min="{{today_date}}" >
+                          <span id="date-span" style="color:red;"></span> 
+                </div>
+
+                <div class="col p-3">
+                  <label for="couponCode">Coupon Code</label>
+                  <div class="">
+                  
+                    <div class="d-flex justify-content-center">
+                    <input type="text" id="couponCode" value="{{ couponCode }}" name="couponCode"
+                           class="form-control border border-dark rounded text-center" placeholder="Generate Coupon Code" disabled>
+                   <a id="generate-coupon" class="btn btn-outline-dark ml-5">
+                      <i class="material-icons md-refresh"></i>
+                    </a>
+                    </div>
+                   <div class="d-flex">
+                    <span id="coupon-span" style="color:red;"></span>
+                   </div>
+                     
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="column">
+            <input type="hidden" id="hidden-coupon-code" name="couponCode" value="">
+              <button type="submit" id="form-submit" class="btn btn btn-primary mt-2">Submit</button>
+            </div>
+            
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+
+<script>
+$('#generate-coupon').on('click',function(event){
+event.preventDefault()
+$.ajax({
+    type:'GET',
+    url:"{% url 'coupon:generate_coupon' %}",
+    success:function(data){
+      console.log(data)
+      $('#couponCode').val(data.data)
+      $('#hidden-coupon-code').val(data.data); 
+    },
+    error:function(){
+      alert("Sorry!! We cant create Coupon code Now, Try again..")
+    }
+})
+})
+</script>
+
+
+<script>
+  $(document).ready(function(){
+    $("#minimum-amount").on('focus', function(){ $('#amount-span').text("") })
+    $("#discount").on('focus', function(){$('#discount-span').text("")})
+    $("#expiry-date").on('focus', function(){$('#date-span').text("")}) // Corrected selector
+    $("#couponCode").on('focus', function(){$('#coupon-span').text("")}) // Corrected selector
+
+    $('#form-submit').click(function(event){
+       event.preventDefault()
+       let minimumamount = parseInt($("#minimum-amount").val())
+       let discount = parseInt($('#discount').val());
+       let date = $('#expiry-date').val()
+       let couponcode = $("#couponCode").val()
+       let amount = minimumamount.toString()
+       let isEligibleForSubmission = true;
+
+       if (minimumamount < 500){
+          $('#amount-span').text("The minimum amount must be set to 500 or higher.")
+          isEligibleForSubmission = false
+       }
+
+       if (isNaN(discount) || discount < 0 || discount > 90) { // Check if discount is not a number or out of range
+          $("#discount-span").text("Enter a valid discount between 0 and 90")
+          isEligibleForSubmission = false
+       }
+
+       if (amount.length > 5 || amount < 0 || isNaN(minimumamount)) { // Check if minimumamount is not a number or out of range
+          $("#amount-span").text("Enter a valid amount")
+          isEligibleForSubmission = false
+       }
+
+       if (date === ""){
+          $("#date-span").text("Please select a date")
+          isEligibleForSubmission = false
+       } else {
+          let selectedDate = new Date(date);
+          let today = new Date();
+          if (selectedDate < today) {
+            $("#date-span").text("Please select a date equal to or after today")
+            isEligibleForSubmission = false
+          }
+       }
+
+       if (couponcode === ""){
+          $("#coupon-span").text("Please enter a coupon code")
+          isEligibleForSubmission = false
+       }
+
+       if (isEligibleForSubmission) 
+          $("#add-coupon-form").submit()
+    });
+});
+</script>
+{% endblock content %}

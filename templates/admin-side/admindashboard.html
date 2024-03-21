@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Admin Panel{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="shortcut icon" type="image/png" href="{% static 'admin_static/images/logos/favicon.png' %}" />
     <link rel="stylesheet" href="{% static 'admin_static/css/styles.min.css' %}" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
@@ -128,7 +129,7 @@
                       <span class="hide-menu">ORDER MANAGEMENT</span>
                     </li>
                     <li class="sidebar-item">
-                      <a class="sidebar-link" href="" aria-expanded="false">
+                      <a class="sidebar-link" href="{% url 'admin_side:order_list' %}" aria-expanded="false">
                         <span>
                           <i class="ti ti-mood-happy"></i>
                         </span>
@@ -155,7 +156,7 @@
                       <span class="hide-menu">OFFER AND COUPONS</span>
                     </li>
                     <li class="sidebar-item">
-                      <a class="sidebar-link" href="" aria-expanded="false">
+                      <a class="sidebar-link" href="{% url 'coupon:view_coupon'%}" aria-expanded="false">
                         <span>
                           <i class="ti ti-mood-happy"></i>
                         </span>

@@ -1,0 +1,189 @@
+{% extends 'admin-side/admindashboard.html' %}
+{% load static  %}
+{% block content %}
+
+
+  <section class="content-main">
+    <div class="content-header">
+      <div>
+        <h2 class="content-title card-title">Edit Coupon</h2>
+        
+      </div>
+      <div>
+        <a type="button" class="btn btn btn-primary" href="{% url 'coupon:view_coupon' %}">Go Back</a>
+      </div>
+    </div>
+
+    <!-- FORM FOR ADD NEW CATEGORY -->
+    <div class="card">
+      <div class="card-body">
+        <div class="container mt-4">
+          <h4>Edit Coupon</h4>
+          <hr>
+          <form method="post" action="{% url 'coupon:edit_coupon' coupons.id %}" id="edit-coupon-form">
+            {% csrf_token %}
+            <div class="">
+              <div class="container">
+                <div class="row row-cols-2">
+                  <div class="col p-3">
+                    <label for="minimum-amount"><span>Minimum Amount</span></label><br>
+                    <input class="form-control border border-dark rounded" id="minimum-amount" name="minimumamount"
+                           type="number" placeholder="Minimum Amount Eligible for discount" value="{{ coupons.min_purchase }}" min="0">
+
+                           <span id="amount-span" style="color:red;"></span>
+
+                  </div>
+                
+                  <div class="col p-3">
+                    <label for="discount"><span>Discount(in percentage)</span></label><br>
+                    <input class="form-control border border-dark rounded" type="number" id="discount" name="discount"
+                           placeholder="Discount" value="{{ coupons.coupon_discount }}"min="0">
+
+                            <span id="discount-span" style="color:red;"></span>   
+                  </div>
+                 
+                  <div class="col p-3" >
+                    <label for="expiry-date"><span>Expiry Date</span></label> <br>
+                    <input class="form-control border border-dark rounded text-center" style="cursor:pointer;" type="date" id="expiry-date"
+                          value="{{coupons.coupon_expiry|date:"Y-m-d"}}" name="expirydate" min="{{today_date}}">
+                          <span id="date-span" style="color:red;"></span> 
+                  </div>
+
+                  <div class="col p-3">
+                    <label for="couponCode">Coupon Code</label>
+                    <div class="d-flex justify-content-center">
+                      <input type="text" id="couponCode" value="{{ coupons.coupon_code }}" name="couponCode"
+                             class="form-control border border-dark rounded text-center" placeholder="Generate Coupon Code" disabled>
+                     
+                      <a id="generate-coupon" class="btn btn-outline-dark ml-5">
+                        <i class="material-icons md-refresh"></i>
+                      </a>
+                    </div>
+                    <div class="d-flex">
+                      <span id="coupon-span" style="color:red;"></span>
+                    </div>
+                  </div>
+
+                  
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="column"></div>
+              <div class="column">
+                <input type="hidden" id="hidden-coupon-id" name="coupon_id" value="{{ coupons.id }}">
+                <button type="submit" id="form-submit" class="btn btn btn-primary mt-2">Submit</button>
+              </div>
+              <div class="column"></div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+
+<script>
+$('#generate-coupon').on('click',function(event){
+  event.preventDefault()
+  $.ajax({
+      type:'GET',
+      url:"{% url 'coupon:generate_coupon' %}",
+      success:function(data){
+        console.log(data)
+        $('#couponCode').val(data.data)
+        $('#hidden-coupon-id').val(data.data);  // Corrected field id
+      },
+      error:function(){
+        alert("Sorry!! We cant create Coupon code Now, Try again..")
+      }
+  })
+})
+</script>
+
+<script>
+  $(document).ready(function(){
+    $("#minimum-amount").on('focus', function(){ $('#amount-span').text("") })
+    $("#discount").on('focus', function(){$('#discount-span').text("")})
+    
+    $('#form-submit').click(function(event){
+        event.preventDefault();
+        
+        // Get the current values of form fields
+        var minimumamount = parseInt($("#minimum-amount").val());
+        var discount = parseInt($('#discount').val());
+        var date = $('#expiry-date').val();
+        var couponcode = $("#couponCode").val();
+        
+        // Validate expiry date
+        var today = new Date(); // Get today's date
+        var expiryDate = new Date(date); // Parse expiry date from input
+        
+        if (expiryDate < today) {
+          // Expiry date is before today's date
+          $('#date-span').text("Expiry date should be today or later");
+          return; // Exit function without submitting the form
+        }
+        
+        // Get the original values of form fields
+        var originalMinimumAmount = parseInt("{{ coupons.min_purchase }}");
+        var originalDiscount = parseInt("{{ coupons.coupon_discount }}");
+        var originalExpiryDate = "{{ coupons.coupon_expiry|date:'Y-m-d' }}";
+        var originalCouponCode = "{{ coupons.coupon_code }}";
+        
+        // Create an object to store form data
+        var formData = {
+          'minimumamount': minimumamount,
+          'discount': discount,
+          'expirydate': date,
+          'couponCode': couponcode
+        };
+        
+        // Merge with original values
+        if (minimumamount === originalMinimumAmount) {
+          formData['originalMinimumAmount'] = originalMinimumAmount;
+        }
+        
+        if (discount === originalDiscount) {
+          formData['originalDiscount'] = originalDiscount;
+        }
+        
+        if (date === originalExpiryDate) {
+          formData['originalExpiryDate'] = originalExpiryDate;
+        }
+        
+        if (couponcode === originalCouponCode) {
+          formData['originalCouponCode'] = originalCouponCode;
+        }
+        
+        // Submit form with all values using AJAX
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'coupon:edit_coupon' coupons.id %}",
+          data: formData,
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+          },
+          success: function(response) {
+            // Handle success
+            console.log(response);
+            // Redirect or show success message
+            window.location.href = "{% url 'coupon:view_coupon' %}";
+          },
+          error: function(xhr, textStatus, errorThrown) {
+            // Handle error
+            console.log(xhr.responseText);
+            // Show error message
+          }
+        });
+    });
+  });
+</script>
+
+
+      
+{% endblock content %}

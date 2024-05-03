@@ -27,7 +27,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -87,8 +87,8 @@ AUTH_USER_MODEL = 'User_Authentication.Account'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True  # Use TLS for secure communication
-EMAIL_HOST_USER = 'amalsiva7210@gmail.com'
-EMAIL_HOST_PASSWORD = 'jwctbiuzqiihznim'
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 EMAIL_DEBUG = True
 
 
@@ -98,9 +98,9 @@ EMAIL_DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'streets',
-        'USER': 'postgres',
-        'PASSWORD': 'siva',
+        'NAME': config('streets'),
+        'USER': config('USER'),
+        'PASSWORD': config('PASSWORD'),
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -159,6 +159,6 @@ MEDIA_ROOT = BASE_DIR/'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-RAZOR_PAY_KEY_ID = 'rzp_test_GbtyzPJXOB41tr'
-RAZOR_PAY_SECRET_KEY= 'AHKAM2R9s92S6FtFWYy9XtiS'
+RAZOR_PAY_KEY_ID = config('RAZOR_PAY_KEY_ID')
+RAZOR_PAY_SECRET_KEY = config('RAZOR_PAY_SECRET_KEY')
 SECURE_CROSS_ORIGIN_OPENER_POLICY="same-origin-allow-popups"

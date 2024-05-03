@@ -7,7 +7,7 @@ from products.models import *
 
 # Create your models here.
 class MyAccountManager(BaseUserManager):
-    def create_user(self,username,email,phone_number,password=None):
+    def create_user(self,username,email,phone_number,password=None,**extra_fields):
         
         if not email:
             raise ValueError('you must have an email')
@@ -18,7 +18,8 @@ class MyAccountManager(BaseUserManager):
         user=self.model(
             email=self.normalize_email(email),
             username=username,
-            phone_number=phone_number
+            phone_number=phone_number,
+            **extra_fields
         )
         
         user.set_password(password)
@@ -52,6 +53,7 @@ class Account(AbstractBaseUser):
     phone_number = models.CharField(max_length=20, null=True)
     is_active = models.BooleanField(default = False)
     is_blocked = models.BooleanField(default = False)
+    referral_id = models.CharField(max_length=20, unique=True, null=True, blank=True)
     
     #required
     date_joined=models.DateTimeField(auto_now_add=True)
@@ -61,6 +63,7 @@ class Account(AbstractBaseUser):
     is_staff=models.BooleanField(default=False)
     is_superadmin=models.BooleanField(default=False)
     is_emailverified = models.BooleanField(default = False)
+    
     
     
     USERNAME_FIELD='email'
@@ -83,6 +86,12 @@ class Account(AbstractBaseUser):
             self.first_name = self.username
             self.last_name = 'no name'
         super().save(*args, **kwargs)
+        
+    def save(self, *args, **kwargs):
+        if not self.referral_id:
+            # Generate a new UUID and set it as the referral_id
+            self.referral_id = str(uuid.uuid4())[:8]  # Using 8 characters of the UUID
+        super().save(*args, **kwargs)
     
 class AddressBook(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE,null=True, default=None)
@@ -102,15 +111,15 @@ class AddressBook(models.Model):
         return self.first_name 
     
     
-class UserProfile(models.Model):
-    user = models.OneToOneField(Account, on_delete=models.CASCADE)
-    otp_secret = models.CharField(max_length=16)  # Store the OTP secret key
+# class UserProfile(models.Model):
+#     user = models.OneToOneField(Account, on_delete=models.CASCADE)
+#     otp_secret = models.CharField(max_length=16)  # Store the OTP secret key
     
     
 
 
 
-class Payment(models.Model):
+class  Payment(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     payment_id = models.CharField(max_length=100)
     payment_method = models.CharField(max_length=100)
@@ -118,6 +127,7 @@ class Payment(models.Model):
     status = models.CharField(max_length=100)
     discount = models.FloatField(default=0,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    
 
     
     def __str__(self):
@@ -158,6 +168,7 @@ class Order(models.Model):
     is_ordered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    payment_status = models.BooleanField(default=False)
 
     
 
@@ -187,7 +198,6 @@ class OrderProduct(models.Model):
     ordered = models.BooleanField(default=False)
     color = models.CharField(max_length=50)
     size = models.CharField(max_length=50)
-
 
     @property
     def get_total(self):

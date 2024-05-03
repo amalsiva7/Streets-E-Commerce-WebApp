@@ -14,6 +14,8 @@ from django.urls import reverse
 from products.models import *
 from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
 from django.db.models import Q
+from wishlist.models import *
+from cart.models import *
 
 
 # Create your views here.
@@ -23,7 +25,7 @@ from django.db.models import Q
 @login_required(login_url='admin_side:adminlogin')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def brand_list(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated and request.user.is_superadmin:
         return redirect('admin_side:adminlogin')
     
     search_query = request.GET.get('search')
@@ -40,7 +42,7 @@ def brand_list(request):
 @login_required(login_url='admin_side:adminlogin')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_brand(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated and request.user.is_superadmin:
         return redirect('admin_side:adminlogin')
     
     if request.method == 'POST':
@@ -62,7 +64,7 @@ def add_brand(request):
 @login_required(login_url='admin_side:adminlogin')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_brand(request,brand_name):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated and request.user.is_superadmin:
         return redirect('admin_side:adminlogin')
     
     brands = get_object_or_404(Brand, brand_name=brand_name)
@@ -83,7 +85,7 @@ def edit_brand(request,brand_name):
 @login_required(login_url='admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def delete_brand(request, brand_name):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated and request.user.is_superadmin:
         return redirect('admin_side:adminlogin')
     
     brand = get_object_or_404(Brand, brand_name=brand_name)
@@ -97,7 +99,7 @@ def delete_brand(request, brand_name):
 @login_required(login_url='admin_side:adminlogin')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def product_list(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated and request.user.is_superadmin:
         return redirect('admin_side:adminlogin')
     
     search_query = request.GET.get('search','')
@@ -113,7 +115,7 @@ def product_list(request):
 @login_required(login_url='admin_side:adminlogin')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_product(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated and request.user.is_superadmin:
         return redirect('admin_side:adminlogin')
 
     categories = Category.objects.all()
@@ -127,10 +129,9 @@ def add_product(request):
         price = request.POST.get('price')
         brand_id = request.POST.get('brand')
         images = request.FILES.getlist('images[]')
-        stock = request.POST.get('stock')
         
         # Perform validation checks
-        if not all([product_id, product_name, category_id, description, price, brand_id, images, stock]):
+        if not all([product_id, product_name, category_id, description, price, brand_id, images]):
             messages.error(request, "Please fill in all the fields.")
             return redirect('product_side:add_product')
         
@@ -171,7 +172,7 @@ def add_product(request):
 @login_required(login_url='admin_side:adminlogin')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_product(request, product_id):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated and request.user.is_superadmin:
         return redirect('admin_side:adminlogin')
     categories = Category.objects.all()
     brands = Brand.objects.all()
@@ -222,7 +223,7 @@ def edit_product(request, product_id):
 @login_required(login_url='admin_side:adminlogin')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def soft_delete_product(request, product_id):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated and request.user.is_superadmin:
         return redirect('admin_side:adminlogin')
 
     try:
@@ -247,7 +248,7 @@ def soft_delete_product(request, product_id):
 @login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def variant_list(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated and request.user.is_superadmin:
         return redirect('admin_side:adminlogin')
     
     search_query = request.GET.get('search', '')
@@ -269,7 +270,7 @@ def variant_list(request):
 @login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_variant(request,variant_id=None):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated and request.user.is_superadmin:
         return redirect('admin_side:adminlogin')
     
     if variant_id:
@@ -303,7 +304,7 @@ def add_variant(request,variant_id=None):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def delete_variant(request, variant_id):
 
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated and request.user.is_superadmin:
         return redirect('admin_side:adminlogin')
     
     variant = get_object_or_404(ProductVariant, id=variant_id)

@@ -1,0 +1,180 @@
+{% extends 'admin-side/admindashboard.html' %}
+{% load static %}
+
+{% block title %}Sales Report{% endblock title %}
+
+{% block content %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+<style>
+  .dropdown-custom {
+      background-color: rgb(207, 200, 200);
+  }
+
+  .small-text {
+      font-size: 12px;
+      /* Adjust the size as needed */
+  }
+</style>
+
+<section class="content-main">
+  <div class="content-header">
+    <div>
+      <h2 class="content-title card-title">Sales Report</h2>
+    </div>
+  </div>
+
+  {% for message in messages %}
+  <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert" style="margin-top: 60px;">
+    <strong></strong>{{message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endfor %}
+
+  <div class="card mb-4">
+    <header class="card-header">
+      <div class="row align-items-end" style="margin-top:50px;">
+        <div class="col-md-4">
+          <form method="post" action="{% url 'admin_side:sales-report-search' %}">
+            {% csrf_token %} 
+            <label>Search </label>
+            <div class="d-flex">
+              <input type="text" name="query" placeholder="Search Order ID" class="form-control">
+              <button type="submit" class="btn btn-outline-primary">Search</button>
+            </div>
+          </form>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; width: 80%; margin: 20px auto;">
+          <div style="width: 30%; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; box-sizing: border-box;">Total Sales : {{order_count}}</div>
+          <div style="width: 30%; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; box-sizing: border-box;">Total Order Amount : {{total_order_product}}</div>
+          <div style="width: 30%; padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; box-sizing: border-box;">Total Discount :  </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 me-auto text-center">
+          <form id="dateSearchForm"  action="{% url  'admin_side:sales-date-search' %}" method="post">
+            {% csrf_token %}
+            <div class="d-flex flex-row justify-content-between">
+              <div class="d-flex flex-column">
+                <input type="number" name="StatusFilter" value="{{ StatusFilter }}" hidden>
+                <label for="startDate">Start Date</label>
+                <input class="form-control" type="date" id="startDate" name="startDate" min="2023-12-17"
+                  max="{{ date.today|stringformat:'Y-m-d' }}">
+              </div>
+              <div class="d-flex flex-column">
+                <label for="endDate">End Date</label>
+                <input class="form-control" type="date" id="endDate" name="endDate" min="2023-12-17"
+                  max="{{ date.today|stringformat:'Y-m-d' }}">
+              </div>
+              <div class="d-flex flex-column align-items-baseline justify-content-end">
+                <button type="submit" class="form-control">
+                  <i class="material-icons md-sort"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="col-md-3 d-flex justify-content-end">
+          <div class="btn-group" style="height:fit-content">
+            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Download Report
+            </button>
+            
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="{% url 'admin_side:sales-report-pdf' %}?start_date={{start_date}}&end_date={{end_date}}">PDF</a>
+              <a class="dropdown-item" href="{% url 'admin_side:sales-report-excel' %}?start_date={{start_date}}&end_date={{end_date}}">Excel</a>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </header>
+
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th class="text-middle">ID</th>
+              <th class="text-middle">Name</th>
+              <th class="text-middle">Email</th>
+              <th class="text-middle">Total</th>
+              <th class="text-middle">Date</th>
+              <th class="text-middle">Status</th>
+              <th class="text-middle">Payment Method</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for data in order %}
+            <tr>
+              <td><h6 class="mb-4 small-text order-id">{{ data.order_number }}</h6></td>
+              <td><h6 class="mb-4 small-text">{{ data.user.username|title }}</h6></td>
+              <td><h6 class="mb-4 small-text">{{ data.user.email }}</h6></td>
+              <td><h6 class="mb-4 small-text">{{ data.get_total }}</h6></td>
+              <td><h6 class="mb-4 small-text">{{ data.created_at }}</h6></td>
+              <td>
+                {% if  data.payment_status %}
+                <span class="badge alert-info">{{data.status}}</span>
+                {% else %}
+                <span class="badge alert-danger"style="color:black">PAYMENT PENDING</span>
+                {% endif %}
+              </td>
+              <td><h6 class="mb-4 small-text">{{ data.payment.payment_method|title }}</h6></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="pagination-area mt-30 mb-50">
+    {% if objects.has_other_pages %}
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+                {% if objects.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ objects.previous_page_number }}">Previous
+                            <i class="material-icons md-chevron_left"></i>
+                        </a>
+                    </li>
+                {% endif %}
+                <li class="page-item {% if objects.number == 1 %}active{% endif %}">
+                    <a class="page-link" href="?page={{ objects.number }}">{{ objects.number }}</a>
+                </li>
+                {% if objects.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ objects.next_page_number }}">Next
+                            <i class="material-icons md-chevron_right"></i>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+
+
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+  integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+  crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Bootstrap CSS -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap JavaScript -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+{% endblock content %}

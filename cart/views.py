@@ -82,8 +82,7 @@ def add_cart(request, product_id):
                         product=product,
                         variations=variant,  # Set the selected variation here
                         quantity=1,  # Set the initial quantity
-                        is_active=True
-                                                )
+                        is_active=True)
                     # to_cart.variations.set([variant])  
                 return redirect('cart:shopping_cart')
             else:
@@ -93,7 +92,7 @@ def add_cart(request, product_id):
         else:
           
             messages.warning(request, 'This item is out of stock.')
-            return redirect('user:product-detail', product_id)
+            return redirect('user_side:product_detail', product_id)
     else:
         messages.warning(request, 'Variant not found.')  # Add an error message for debugging
         return redirect('user_side:product_detail', product_id)

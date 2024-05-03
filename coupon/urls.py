@@ -11,4 +11,8 @@ urlpatterns = [
     
     
     
+    path('apply_coupon/', views.apply_coupon, name='apply_coupon'),
+    
+    
+    
 ]

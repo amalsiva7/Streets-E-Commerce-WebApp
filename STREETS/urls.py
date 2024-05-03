@@ -28,5 +28,9 @@ urlpatterns = [
     path('', include('products.urls')),
     path('', include('cart.urls')),
     path('', include('coupon.urls')),
+    path('payment/', include('payment.urls')),
+    path('', include('wishlist.urls')),
+    path('', include('wallet.urls')),
+    
     
  ] + static(settings.MEDIA_URL,document_root= settings.MEDIA_ROOT)

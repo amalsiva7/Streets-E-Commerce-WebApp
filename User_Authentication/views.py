@@ -17,25 +17,44 @@ from cart.models import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import AddressBook
 from .forms import AddressForm
+from wishlist.models import *
+from coupon.models import *
 from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+import razorpay
 
 # Create your views here.
 
+from django.db.models import Count
+
 def index(request):    
+    
+    search_query = request.GET.get('search_product')
+    cart_items_count = 0
+    wishlist_items_count = 0
+    
     # Fetch all products from the database
     all_products = Product.objects.filter(is_active=True)
     
     # Get 4 random products from the list of all products
     random_products = sample(list(all_products), 4)
     
-    # Pass the random products to the template context
+    if request.user.is_authenticated:
+        cart_items_count = CartItem.objects.filter(user=request.user, is_active=True).count()
+        wishlist_items_count = WishList.objects.filter(user=request.user).count()
+        
+    print(cart_items_count,wishlist_items_count,"Cart Count Wishlist Count*************************************")
+    
+    # Pass the random products and counts to the template context
     context = {
-        'products': random_products
+        'products': random_products,
+        'cart_count': cart_items_count,
+        'wishlist_count': wishlist_items_count
     }
     
     # Render the template with the context
     return render(request, 'user-side/index.html', context)
+
 
 
 ####################  LOGIN  ###################
@@ -152,9 +171,14 @@ def signup(request):
             print(f"An error occurred: {e}")
             messages.error(request, "An error occurred while processing your request")
             return redirect("user_side:signup")
+        
+        
+        referral_id = str(uuid.uuid4())[:8]
 
         # If no exception occurs, create the user
-        myuser = Account.objects.create_user(user_name, email, phone, password)
+        myuser = Account.objects.create_user(user_name, email, phone, password,referral_id=referral_id)
+        
+        print(myuser.referral_id,"**********************************************************************************************")
 
         request.session['user_name'] = user_name
         request.session['email'] = email
@@ -203,6 +227,9 @@ def verify_otp(request):
          user.save()
          login(request,user)
          messages.success(request, "signup successful!")
+         
+         
+         
          return redirect('user_side:index-page')
    return render(request,'user-side/verify_otp.html')
 
@@ -238,25 +265,26 @@ def resend_otp(request):
 ################################ PRODUCT PAGE ################################
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def product_page(request, category_slug=None, price_range=None,sort_by=None):
-    categories = category_slug
+def product_page(request):
+    category_slug = request.GET.get('category_slug')
+    price_range = request.GET.get('price_range')
+    sort_by = request.GET.get('sort_by')
     search_query = request.GET.get('search_product')
-    sort_by = sort_by
-    
-    
-    
-    products = Product.objects.filter(is_active=True)
-    
-  
+
+    products = Product.objects.filter(is_active=True,productvariant__isnull=False).distinct()
+
+    if category_slug:
+        # Filter products based on category
+        products = products.filter(category__slug=category_slug)
+
     if price_range:
+        # Filter products based on price range
         min_price, max_price = map(float, price_range.split('-'))
         products = products.filter(price__gte=min_price, price__lte=max_price)
-
 
     if search_query:
         # Filter products based on search query
         products = products.filter(Q(product_name__icontains=search_query) | Q(description__icontains=search_query))
-     
 
     if sort_by == 'low_to_high':
         products = products.order_by('price')
@@ -265,22 +293,84 @@ def product_page(request, category_slug=None, price_range=None,sort_by=None):
     elif sort_by == 'new_arrivals':
         products = products.order_by('-product_id')
     elif sort_by == 'aA_to_zZ':
-        products = products.order_by('product_name')
+        if price_range:
+            # Sort products within the specified price range alphabetically by product name (aA to zZ)
+            products = products.filter(price__gte=min_price, price__lte=max_price).order_by('product_name')
+        else:
+            # Sort all products alphabetically by product name (aA to zZ)
+            products = products.order_by('product_name')
     elif sort_by == 'zZ_to_aA':
-        products = products.order_by('-product_name')
-        
-        
-    # paginator = Paginator(products, 4)
-    # page = request.GET.get('page')
-
+        if price_range:
+            # Sort products within the specified price range alphabetically by product name (zZ to aA)
+            products = products.filter(price__gte=min_price, price__lte=max_price).order_by('-product_name')
+        else:
+            # Sort all products alphabetically by product name (zZ to aA)
+            products = products.order_by('-product_name')
+            
+    if request.user.is_authenticated:
+        cart_items_count = CartItem.objects.filter(user=request.user, is_active=True).count()
+        wishlist_items_count = WishList.objects.filter(user=request.user).count()
 
     context = {
         'products': products,
         'category_slug': category_slug,
         'price_range': price_range,
         'sort_by': sort_by,
+        'cart_items_count':cart_items_count,
+        'wishlist_items_count':wishlist_items_count
     }
-    return render(request,'user-side/product.html',context)
+    return render(request, 'user-side/product.html', context)
+
+
+###############################################################################PRODUCT FILTERING###############################################################################
+def shop_product_list(request):
+
+    products = Product.objects.filter(is_active=True)
+    selected_brands = []
+    selected_categories = []
+
+    # Filter products based on brand and category
+    brand_list = request.GET.getlist("brand")
+    category_list = request.GET.getlist("category")
+    min_price = request.GET.get("min_price")
+    max_price = request.GET.get("max_price")
+
+    if brand_list:
+        products = products.filter(product_brand__in=brand_list, is_active=True)
+        for product in products:
+            selected_brands.append(product.product_brand.id)
+
+    if category_list:
+        products = products.filter(product_category__in=category_list, is_active=True)
+        for product in products:
+            selected_categories.append(product.product_category.id)
+    
+    if min_price and max_price:
+        products = products.filter(offer_price__range=[min_price, max_price], is_active=True)
+
+
+    # Paginate the filtered products
+    paginator = Paginator(products, 9)
+    page = request.GET.get("page", 1)
+
+    try:
+        paginated_products = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_products = paginator.page(1)
+    except EmptyPage:
+        paginated_products = paginator.page(paginator.num_pages)
+
+    # Pass the paginated products, categories, and brands to the template
+    content = {
+        "products": paginated_products,
+        "categories": Category.objects.filter(is_available=True),
+        "brands": Brand.objects.filter(status=True),
+        "selected_brands": selected_brands,
+        "selected_categories": selected_categories,
+    }
+
+    return render(request, "user_side/shop-product-list.html", content)
+###############################################################################PRODUCT FILTERING###############################################################################
 
 
 def stock_check(request):
@@ -311,23 +401,20 @@ def product_detail(request, product_id):
     product = request.POST.get('product')
     
     stocks = None
-
-    
     try:
         products_data = ProductVariant.objects.get(product_id=product, size=variant)
         
         stocks = products_data.stock
     except:
         pass
-    
    
     products = get_object_or_404(Product, pk=product_id)
-    product_variants = ProductVariant.objects.filter(product=products)
+    product_variants = ProductVariant.objects.filter(product=product_id)
     selected_size = request.GET.get('size')  # Get the selected size from the query parameters
     if selected_size:
         product_variants = product_variants.filter(size=selected_size)
         
-    print("ssssssssssssssssssssssssstttttttttttttttttttt:", stocks)
+    print("product detail page is selected stock *******************:", stocks)
     context = {
         'products': products,# product details
         'product_variants': product_variants, # varients
@@ -338,10 +425,10 @@ def product_detail(request, product_id):
     print(context)
     if request.headers.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
         # If the request is AJAX, return a JSON response with the context data
-        print("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
+        print("if rerequest.headers.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest' in  product detail page '(If the request is AJAX, return a JSON response with the context data)'")
         return JsonResponse({'success': True, 'context': context})
     else:
-        print("lllllllllllllllllllllllllllllllllll")
+        print("If the request is AJAX, return a JSON response with the context data in product detail page")
         # If the request is not AJAX, render the template as usual
         return render(request, 'user-side/blu.html', context)
     
@@ -624,14 +711,14 @@ def set_default_address(request, address_id):
     return redirect('user_side:checkout')
 
 
-
+from django.conf import settings
+from coupon.views import apply_coupon
 @login_required(login_url='user_side:userlogin')
 def place_order(request, total=0, quantity=0):
     if not request.user.is_authenticated:
         return redirect('user_side:userlogin')
     
     current_user = request.user
-    # coupons = Coupon.objects.all()
 
     #If the cart count is less than 0, then redirect back to home
     cart_items = CartItem.objects.filter(user=current_user)
@@ -642,14 +729,12 @@ def place_order(request, total=0, quantity=0):
 
     grand_total = 0
     tax = 0
-    # coupon_discount = 0
+    coupon_discount = 0
     
     for cart_item in cart_items:
         total += (cart_item.product.price * cart_item.quantity)
         quantity += cart_item.quantity
     tax = (2 * total)/100
-
-   
 
     grand_total = total + tax 
     
@@ -660,7 +745,7 @@ def place_order(request, total=0, quantity=0):
             address = AddressBook.objects.get(user=request.user,is_default=True)
         except:
             messages.warning(request, 'No delivery address exists! Add a address and try again')
-            return redirect('user_side:checkout')
+            return place_order(request)
         
         
         data = Order()
@@ -690,26 +775,31 @@ def place_order(request, total=0, quantity=0):
         data.order_number = order_number
         data.save()
 
-    
-
-        # coupons=Coupon.objects.all()
-
         order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number)
+        
+        coupons = Coupon.objects.all()
+        
+        client = razorpay.Client(auth=(settings.RAZOR_PAY_KEY_ID, settings.RAZOR_PAY_SECRET_KEY))
+        
+        delivery_charges = 54
+        
+        
         context = {
             'order': order,
             'cart_items': cart_items,
             'total': total,
             'tax': tax,
-            'grand_total': grand_total
-            # 'coupons': coupons,
-            # 'coupon_discount':coupon_discount
-            
+            'grand_total': grand_total,
+            'coupons': coupons,
+            'coupon_discount':coupon_discount,
+            'delivery_charges':delivery_charges,
         }
 
-
-
-
-        return render(request, 'user-side/payment.html', context)
+        if grand_total > 1000:
+            messages.error(request, "Cash on delivery is not available for orders exceeding 1000. Please choose another payment method.")
+            return render(request, 'user-side/payment.html', context)
+        else:
+            return render(request, 'user-side/payment.html', context)
     else:
         return redirect('user_side:checkout')
    
@@ -723,8 +813,11 @@ def pay_with_cash_on_delivery(request, order_id):
     cur_user = request.user
     order = Order.objects.get(id=order_id)
     print('***************order*************',order)
-    
-
+     
+    if order.order_total >= 1000:
+        messages.error(request, "COD is acceptable for payment above 1000. Please choose other options")
+        return redirect('user_side:place_order')
+     
     payment_id = f'uw{order.order_number}{order_id}'
     payment = Payment.objects.create(
         user=cur_user, 
@@ -737,7 +830,6 @@ def pay_with_cash_on_delivery(request, order_id):
     order.is_ordered = True
     order.payment = payment
     order.save()
-
 
     cart_items = CartItem.objects.filter(user=request.user)
 
@@ -807,7 +899,7 @@ def order_history(request):
     all_orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
 
     # Number of orders to display per page
-    per_page = 5
+    per_page = 3
 
     paginator = Paginator(all_orders, per_page)
     
@@ -823,6 +915,7 @@ def order_history(request):
 
     context = {
         'orders': orders,
+        'all_orders':all_orders
     }
     return render(request, 'user-side/order_history.html', context)
 

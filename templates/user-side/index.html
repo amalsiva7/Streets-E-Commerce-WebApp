@@ -56,97 +56,81 @@
 	<header >
 		<!-- Header desktop -->
 		<div class="container-menu-desktop">
-			
 			<!-- Topbar -->
 			<div class="top-bar">
-				
-		
-				<div class="content-topbar flex-sb-m h-full container">
-					<div class="left-top-bar">
-						You can have anything you want in life if you dress for it. —Edith Head
+					<div class="content-topbar flex-sb-m h-full container">
+							<div class="left-top-bar">
+									You can have anything you want in life if you dress for it. —Edith Head
+							</div>
+							<div class="right-top-bar flex-w h-full">
+									<a href="#" class="flex-c-m trans-04 p-lr-25">
+											Help & FAQs
+									</a>
+									{% if request.user.is_authenticated %}
+											<a href="{% url 'user_side:user_profile' %}" class="flex-c-m trans-04 p-lr-25">
+													Profile: {{ request.user.username }}
+											</a>
+											<a href="{% url 'user_side:userlogout' %}" class="flex-c-m trans-04 p-lr-25">
+													Sign out
+											</a>
+									{% else %}
+											<a href="{% url 'user_side:userlogin' %}" class="flex-c-m trans-04 p-lr-25">
+													Login/Signup
+											</a>
+									{% endif %}
+							</div>
 					</div>
-
-					<div class="right-top-bar flex-w h-full">
-						<a href="#" class="flex-c-m trans-04 p-lr-25">
-								Help & FAQs
-						</a>
-						{% if request.user.is_authenticated  %}    
-								<a href="{% url 'user_side:user_profile' %}" class="flex-c-m trans-04 p-lr-25">
-									Profile: {{ request.user.username }}
-								</a>
-								<a href="{% url 'user_side:userlogout' %}" class="flex-c-m trans-04 p-lr-25">
-										Sign out
-								</a>
-						{% else %}
-								<a href="{% url 'user_side:userlogin' %}" class="flex-c-m trans-04 p-lr-25">
-										Login/Signup
-								</a>
-						{% endif %}
-				</div>
-				
-				</div>
 			</div>
-
 			<div class="wrap-menu-desktop">
-				<nav class="limiter-menu-desktop container">
-				
-					<!-- Logo desktop -->		
-					<a href="{% url 'user_side:index-page' %}" class="logo">
-						<img src="{% static 'user/images/icons/streets-logo.png' %}" alt="IMG-LOGO">
-					</a>
-				
-					  
-
-					<!-- Menu desktop -->
-					<div class="menu-desktop">
-						<ul class="main-menu">
-							<li>
-								<a href="{% url 'user_side:index-page' %}">Home</a>
+					<nav class="limiter-menu-desktop container">
+							<!-- Logo desktop -->
+							<a href="{% url 'user_side:index-page' %}" class="logo">
+									<img src="{% static 'user/images/icons/streets-logo.png' %}" alt="IMG-LOGO">
+							</a>
+							<!-- Menu desktop -->
+							<div class="menu-desktop">
+									<ul class="main-menu">
+											<li>
+													<a href="{% url 'user_side:index-page' %}">Home</a>
+											</li>
+											<li>
+													<a href="{% url 'user_side:product_page' %}">Shop</a>
+											</li>
+											<li>
+													<a href="blog.html">Blog</a>
+											</li>
+											<li>
+													<a href="about.html">About</a>
+											</li>
+											<li>
+													<a href="contact.html">Contact</a>
+											</li>
+											<!-- <li class="label1" data-label1="hot">
+													<a href="shoping-cart.html">New Arrivals</a>
+											</li> -->
+									</ul>
+							</div>    
+							<!-- Icon header -->
+							<div class="wrap-icon-header flex-w flex-r-m">
+									<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 js-show-modal-search">
+											<i class="zmdi zmdi-search"></i>
+									</div>
+									<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti js-show-cart" data-notify="{{ cart_count }}">
+										<a href="{% url 'cart:shopping_cart' %}">
+												<i class="zmdi zmdi-shopping-cart" style="color: black;"></i>
+										</a>
+								</div>
+								<div class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti" data-notify="{{ wishlist_count }}">
+										<a href="{% url 'wishlist:wishlist_page' %}">
+												<i class="zmdi zmdi-favorite-outline" style="color: black;"></i>
+										</a>
+								</div>
 								
-							</li>
-
-							<li>
-								<a href="{% url 'user_side:product_page' %}">Shop</a>
-							</li>
-
-							<li>
-								<a href="blog.html">Blog</a>
-							</li>
-
-							<li>
-								<a href="about.html">About</a>
-							</li>
-
-							<li>
-								<a href="contact.html">Contact</a>
-							</li>
-        					
-
-							<!-- <li class="label1" data-label1="hot">
-								<a href="shoping-cart.html">New Arrivals</a>
-							</li> -->
-
-						</ul>
-					</div>	
-
-					<!-- Icon header -->
-					<div class="wrap-icon-header flex-w flex-r-m">
-						<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 js-show-modal-search">
-							<i class="zmdi zmdi-search"></i>
-						</div>
-
-						<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti js-show-cart" data-notify="{{cart_count}}">
-							<a href="{% url 'cart:shopping_cart' %}"><i class="zmdi zmdi-shopping-cart" ></i></a>
-						</div>
-						
-						<a href="" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti" data-notify="">
-							<i class="zmdi zmdi-favorite-outline"></i>
-						</a>
-						
-					</div>
-				</nav>
-			</div>	
-		</div>
+							</div>
+					</nav>
+			</div>  
+	</div>
+	
 
 		<!-- Header Mobile -->
 		<div class="wrap-header-mobile">
@@ -160,24 +144,21 @@
 			<!-- Icon header -->
 			<div class="wrap-icon-header flex-w flex-r-m">
 				<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 js-show-modal-search">
-					<i class="zmdi zmdi-search"></i>
+						<i class="zmdi zmdi-search"></i>
 				</div>
-
-				<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti js-show-cart" data-notify="">
-					<a href="{% url 'cart:shopping_cart'%}"><i class="zmdi zmdi-shopping-cart"></i></a>
+		
+				<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti js-show-cart" data-notify="{{cart_count}}" >
+						<a href="{% url 'cart:shopping_cart' %}">
+								<i class="zmdi zmdi-shopping-cart"></i>
+						</a>
 				</div>
 				
-				<a href="" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti" data-notify="">
-					<i class="zmdi zmdi-favorite-outline"></i>
-				</a>
-				
-			</div>
-
-			<!-- Button show menu -->
-			<div class="btn-show-menu-mobile hamburger hamburger--squeeze">
-				<span class="hamburger-box">
-					<span class="hamburger-inner"></span>
-				</span>
+				<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti" data-notify="{{wishlist_count}}" >
+						<a href="{% url 'wishlist:wishlist_page' %}">
+								<i class="zmdi zmdi-favorite-outline"></i>
+						</a>
+				</div>
+		</div>
 			</div>
 		</div>
 

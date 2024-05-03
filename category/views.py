@@ -11,15 +11,17 @@ from django.utils import timezone
 from django.db.models import Sum, F, Value, Count
 from datetime import datetime, timedelta
 from collections import defaultdict
+from Admin_panel.views import *
 
 # Create your views here.
 
 ########################################CATEGORY########################################
 
 @login_required(login_url='admin_side:adminlogin')
+@superadmin_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def category_list(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated and request.user.is_superadmin:
         return redirect('admin_side:adminlogin')
     
     search_query = request.GET.get('search')
@@ -37,9 +39,10 @@ def category_list(request):
 
 
 @login_required(login_url='admin_side:adminlogin')
+@superadmin_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_category(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated and request.user.is_superadmin:
         return redirect('admin_side:adminlogin')
     
     if request.method == 'POST':
@@ -60,8 +63,9 @@ def add_category(request):
 
 @login_required(login_url='admin_side:adminlogin')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@superadmin_required
 def delete_category(request,category_name):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated and request.user.is_superadmin:
         return redirect('admin_side:adminlogin')
     
     category = get_object_or_404(Category, category_name = category_name)

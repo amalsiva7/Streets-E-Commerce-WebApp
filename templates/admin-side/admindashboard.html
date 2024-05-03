@@ -1,179 +1,180 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Admin Panel{% endblock %}</title>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="shortcut icon" type="image/png" href="{% static 'admin_static/images/logos/favicon.png' %}" />
-    <link rel="stylesheet" href="{% static 'admin_static/css/styles.min.css' %}" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.9/cropper.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.min.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Admin Panel{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="shortcut icon" type="image/png" href="{% static 'admin_static/images/logos/favicon.png' %}" />
+  <link rel="stylesheet" href="{% static 'admin_static/css/styles.min.css' %}" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.9/cropper.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
-     <!-- alterify -->
 
-	<!-- CSS -->
-	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
-	<!-- Default theme -->
-	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
+
+  <!-- alterify -->
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css" />
+  <!-- Default theme -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css" />
 
 
 </head>
+
 <body>
-    <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
     data-sidebar-position="fixed" data-header-position="fixed">
-        <!-- Sidebar Start -->
-        <aside class="left-sidebar">
-            <!-- Sidebar scroll-->
-            <div>
-                <div class="brand-logo d-flex align-items-center justify-content-between">
-                  <a href="{% url 'admin_side:dashboard' %}" class="text-nowrap logo-img">
-                    <img src="{% static 'user/images/icons/streets-logo.png' %}" width="180" alt="" />
-                  </a>
-                  <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
-                    <i class="ti ti-x fs-8"></i>
-                  </div>
-                </div>
-                <!-- Sidebar navigation-->
-                <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
-                  <ul id="sidebarnav">
-                    <li class="nav-small-cap">
-                      <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-                      <span class="hide-menu">Home</span>
-                    </li>
-                    <li class="sidebar-item">
-                      <a class="sidebar-link" href="{% url 'admin_side:dashboard' %}" aria-expanded="false">
-                        <span>
-                          <i class="ti ti-layout-dashboard"></i>
-                        </span>
-                        <span class="hide-menu">Dashboard</span>
-                      </a>
-                    </li>
+    <!-- Sidebar Start -->
+    <aside class="left-sidebar">
+      <!-- Sidebar scroll-->
+      <div>
+        <div class="brand-logo d-flex align-items-center justify-content-between">
+          <a href="{% url 'admin_side:dashboard' %}" class="text-nowrap logo-img">
+            <img src="{% static 'user/images/icons/streets-logo.png' %}" width="180" alt="" />
+          </a>
+          <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
+            <i class="ti ti-x fs-8"></i>
+          </div>
+        </div>
+        <!-- Sidebar navigation-->
+        <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
+          <ul id="sidebarnav">
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Home</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admin_side:dashboard' %}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-layout-dashboard"></i>
+                </span>
+                <span class="hide-menu">Dashboard</span>
+              </a>
+            </li>
 
-                    <li class="nav-small-cap">
-                      <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-                      <span class="hide-menu">REPORTS</span>
-                    </li>
-                    <li class="sidebar-item">
-                      <a class="sidebar-link" href="" aria-expanded="false">
-                        <span>
-                          <i class="ti ti-article"></i>
-                        </span>
-                        <span class="hide-menu">Reports</span>
-                      </a>
-                    </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admin_side:sales-report' %}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-layout-dashboard"></i>
+                </span>
+                <span class="hide-menu">Reports</span>
+              </a>
+            </li>
 
-                    <li class="nav-small-cap">
-                      <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-                      <span class="hide-menu">PRODUCT MANAGEMENT</span>
-                    </li>
-                    <li class="sidebar-item">
-                      <a class="sidebar-link" href=" {% url 'product_side:productlist' %} " aria-expanded="false">
-                        <span>
-                          <i class="ti ti-article"></i>
-                        </span>
-                        <span class="hide-menu">Products</span>
-                      </a>
-                    </li>
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">PRODUCT MANAGEMENT</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href=" {% url 'product_side:productlist' %} " aria-expanded="false">
+                <span>
+                  <i class="ti ti-article"></i>
+                </span>
+                <span class="hide-menu">Products</span>
+              </a>
+            </li>
 
-                    
 
-                    <li class="nav-small-cap">
-                      <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-                      <span class="hide-menu">PRODUCT variation</span>
-                    </li>
-                    <li class="sidebar-item">
-                      <a class="sidebar-link" href="{% url 'product_side:variant-list'%}" aria-expanded="false">
-                        <span>
-                          <i class="ti ti-article"></i>
-                        </span>
-                        <span class="hide-menu">Products variation</span>
-                      </a>
-                    </li>
 
-                    
-                    <li class="nav-small-cap">
-                      <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-                      <span class="hide-menu">CATEGORY MANAGEMENT</span>
-                    </li>
-                    <li class="sidebar-item">
-                      <a class="sidebar-link" href="{% url 'category_side:categorylist' %}" aria-expanded="false">
-                        <span>
-                          <i class="ti ti-login"></i>
-                        </span>
-                        <span class="hide-menu">Categories</span>
-                      </a>
-                    </li>
-                    
-        
-                    <li class="nav-small-cap">
-                      <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-                      <span class="hide-menu">USER MANAGEMENT</span>
-                    </li>
-                    <li class="sidebar-item">
-                      <a class="sidebar-link" href="{% url 'admin_side:userlist' %}" aria-expanded="false">
-                        <span>
-                          <i class="ti ti-user"></i>
-                        </span>
-                        <span class="hide-menu">User List</span>
-                      </a>
-                    </li>
-        
-                    
-        
-                    <li class="nav-small-cap">
-                      <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-                      <span class="hide-menu">ORDER MANAGEMENT</span>
-                    </li>
-                    <li class="sidebar-item">
-                      <a class="sidebar-link" href="{% url 'admin_side:order_list' %}" aria-expanded="false">
-                        <span>
-                          <i class="ti ti-mood-happy"></i>
-                        </span>
-                        <span class="hide-menu">Order List</span>
-                      </a>
-                    </li>
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">PRODUCT variation</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'product_side:variant-list'%}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-article"></i>
+                </span>
+                <span class="hide-menu">Products variation</span>
+              </a>
+            </li>
 
-                    <li class="nav-small-cap">
-                      <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-                      <span class="hide-menu">BRAND MANAGEMENT</span>
-                    </li>
-                    <li class="sidebar-item">
-                      <a class="sidebar-link" href="{% url 'product_side:brandlist'%}" aria-expanded="false">
-                        <span>
-                          <i class="ti ti-user"></i>
-                        </span>
-                        <span class="hide-menu">Brands</span>
-                      </a>
-                    </li>
-        
-        
-                    <li class="nav-small-cap">
-                      <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-                      <span class="hide-menu">OFFER AND COUPONS</span>
-                    </li>
-                    <li class="sidebar-item">
-                      <a class="sidebar-link" href="{% url 'coupon:view_coupon'%}" aria-expanded="false">
-                        <span>
-                          <i class="ti ti-mood-happy"></i>
-                        </span>
-                        <span class="hide-menu">Coupons</span>
-                      </a>
-                    </li>
-                    <li class="sidebar-item">
-                      <a class="sidebar-link" href="" aria-expanded="false">
-                        <span>
-                          <i class="ti ti-mood-happy"></i>
-                        </span>
-                        <span class="hide-menu">Category Offers</span>
-                      </a>
-                    </li>
-        
-        
-                    <!-- <li class="nav-small-cap">
+
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">CATEGORY MANAGEMENT</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'category_side:categorylist' %}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-login"></i>
+                </span>
+                <span class="hide-menu">Categories</span>
+              </a>
+            </li>
+
+
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">USER MANAGEMENT</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admin_side:userlist' %}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-user"></i>
+                </span>
+                <span class="hide-menu">User List</span>
+              </a>
+            </li>
+
+
+
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">ORDER MANAGEMENT</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admin_side:order_list' %}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-mood-happy"></i>
+                </span>
+                <span class="hide-menu">Order List</span>
+              </a>
+            </li>
+
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">BRAND MANAGEMENT</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'product_side:brandlist'%}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-user"></i>
+                </span>
+                <span class="hide-menu">Brands</span>
+              </a>
+            </li>
+
+
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">OFFER AND COUPONS</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'coupon:view_coupon'%}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-mood-happy"></i>
+                </span>
+                <span class="hide-menu">Coupons</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="" aria-expanded="false">
+                <span>
+                  <i class="ti ti-mood-happy"></i>
+                </span>
+                <span class="hide-menu">Category Offers</span>
+              </a>
+            </li>
+
+
+            <!-- <li class="nav-small-cap">
                       <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
                       <span class="hide-menu">BANNER MANAGEMENT</span>
                     </li>
@@ -185,9 +186,9 @@
                         <span class="hide-menu">Banners</span>
                       </a>
                     </li> -->
-        
-        
-                    <!-- <li class="sidebar-item">
+
+
+            <!-- <li class="sidebar-item">
                       <a class="sidebar-link" href="./sample-page.html" aria-expanded="false">
                         <span>
                           <i class="ti ti-aperture"></i>
@@ -195,62 +196,448 @@
                         <span class="hide-menu">Sample Page</span>
                       </a>
                     </li> -->
-                  </ul>
-                  
-                </nav>
-                <!-- End Sidebar navigation -->
-              </div>
-            <!-- ... Rest of your sidebar content ... -->
+          </ul>
 
-        </aside>
-        <!--  Sidebar End -->
+        </nav>
+        <!-- End Sidebar navigation -->
+      </div>
+      <!-- ... Rest of your sidebar content ... -->
 
-        <div class="body-wrapper">
-            <!--  Header Start -->
-            <!-- ... Rest of your header content ... -->
-            <header class="app-header">
-                <nav class="navbar navbar-expand-lg navbar-light">
-                  <ul class="navbar-nav">
-                    <li class="nav-item d-block d-xl-none">
-                      <a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse" href="javascript:void(0)">
-                        <i class="ti ti-menu-2"></i>
-                      </a>
-                    </li>
-                    
-                  </ul>
-                  <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
-                    <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
-                      
-                      <li class="nav-item dropdown">
-                        <a class="nav-link nav-icon-hover" href="{% url 'admin_side:adminlogout' %}" id="drop2" data-bs-toggle="dropdown"
-                          aria-expanded="false">
-                          <img src="{% static 'admin_static/images/profile/user-1.jpg' %}" alt="" width="35" height="35" class="rounded-circle">
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
-                          <div class="message-body">
-                            <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                              <i class="ti ti-user fs-6"></i>
-                              <p class="mb-0 fs-3">My Profile</p>
-                            </a>
-                            
-                            <a href="{% url 'admin_side:adminlogout' %}" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
-                          </div>
-                        </div>
-                      </li>
-                    </ul>
+    </aside>
+    <!--  Sidebar End -->
+
+    <div class="body-wrapper">
+      <!--  Header Start -->
+      <!-- ... Rest of your header content ... -->
+      <header class="app-header">
+        <nav class="navbar navbar-expand-lg navbar-light">
+          <ul class="navbar-nav">
+            <li class="nav-item d-block d-xl-none">
+              <a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse" href="javascript:void(0)">
+                <i class="ti ti-menu-2"></i>
+              </a>
+            </li>
+
+          </ul>
+          <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
+            <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+
+              <li class="nav-item dropdown">
+                <a class="nav-link nav-icon-hover" href="{% url 'admin_side:adminlogout' %}" id="drop2"
+                  data-bs-toggle="dropdown" aria-expanded="false">
+                  <img src="{% static 'admin_static/images/profile/user-1.jpg' %}" alt="" width="35" height="35"
+                    class="rounded-circle">
+                </a>
+                <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
+                  <div class="message-body">
+                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                      <i class="ti ti-user fs-6"></i>
+                      <p class="mb-0 fs-3">My Profile</p>
+                    </a>
+
+                    <a href="{% url 'admin_side:adminlogout' %}"
+                      class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
                   </div>
-                </nav>
-              </header>
-
-        </div>
-
-        <div class="body-wrapper">
-            <!-- Content specific to each page will be inserted here -->
-            {% block content %}
-            {% endblock %}
-        </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </header>
 
     </div>
+
+    <div class="body-wrapper">
+      <!-- Content specific to each page will be inserted here -->
+      {% block content %}
+
+      <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+
+        <!--FontAwesome CDN-->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css"
+          integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+
+        <!--Chartjs CDN-->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+
+        <!--Custome CSS-->
+        <link rel="stylesheet" href="./style.css">
+
+        <title></title>
+      </head>
+
+      <div>
+        <div style='height:100px'>
+
+        </div>
+
+        <!--Topside-->
+        <div class="container">
+          <div class="row mt-4">
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header bg-info text-white">
+                  Information
+                </div>
+                <div class="card-body">
+                  <marquee behavior="" direction="">
+                    <h3 class="my-4">This is the Information</h3>
+                  </marquee>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-8">
+              <div class="card">
+                <div class="card-header bg-info text-white">
+                  Statistics
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <a class="text-decoration-none text-dark" href="#">
+                        <div class="card my-card shadow text-center p-3">
+                          <h4>Users<i class="fas fa-users"></i></h4>
+                          <h3>{{total_users_count}}</h3>
+                        </div>
+                      </a>
+                    </div>
+                    <div class="col-md-4">
+                      <a class="text-decoration-none text-dark" href="#">
+                        <div class="card my-card shadow text-center p-3">
+                          <h4>Products <i class="fas fa-box"></i></h4>
+                          <h3>{{product_count}}</h3>
+                        </div>
+                      </a>
+                    </div>
+                    <div class="col-md-4">
+                      <a class="text-decoration-none text-dark" href="#">
+                        <div class="card my-card shadow text-center p-3">
+                          <h4>Orders <i class="fas fa-shipping-fast"></i></h4>
+                          <h3>{{order}}</h3>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--End Topside-->
+
+        <!--Graphs-->
+        <div class="container">
+          <div class="row my-5">
+            <div class="col-md-12" style="margin-bottom: 110px;margin-top: 20px;">
+              <div class="bg-white">
+                <canvas id="myChart1" width="200" height="100"></canvas>
+                <script>
+                  var ctx = document.getElementById('myChart1').getContext('2d');
+                  var myChart1 = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                      labels: [{% for i in variants %} '{{ i.product.product_name}}', {% endfor %}],
+                  //labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                  datasets: [{
+                    label: 'Products',
+                    data: [{% for i in variants %} {{ i.stock }}, {% endfor %}],
+                    //data: [12, 19, 3, 5, 2, 3],
+
+                    backgroundColor: [
+                      'rgba(255, 99, 132, 1)',
+                      'rgba(54, 162, 235, 1)',
+                      'rgba(255, 206, 86, 1)',
+                      'rgba(75, 192, 192, 1)',
+                      'rgba(153, 102, 255, 1)',
+                      'rgba(255, 159, 64, 1)',
+                      'rgba(255, 199, 132, 1)',
+                      'rgba(54, 362, 235, 1)',
+                      'rgba(255, 806, 86, 1)',
+                      'rgba(75, 792, 192, 1)',
+                      'rgba(153, 602, 255, 1)',
+                      'rgba(255, 90, 64, 1)',
+                      'rgba(25, 999, 32, 1)',
+                      'rgba(54, 462, 35, 1)',
+                      'rgba(55, 806, 786, 1)',
+                      'rgba(75, 2, 92, 1)',
+                      'rgba(15, 10, 955, 1)',
+                      'rgba(2, 755, 664, 1)',
+                      'rgba(882, 9, 632, 1)',
+                      'rgba(554, 0, 835, 1)',
+                      'rgba(999, 80, 886, 1)',
+                      'rgba(705, 2, 492, 1)',
+                      'rgba(103, 602, 55, 1)',
+                      'rgba(255, 99, 132, 1)',
+                      'rgba(54, 162, 235, 1)',
+                      'rgba(255, 206, 86, 1)',
+                      'rgba(75, 192, 192, 1)',
+                      'rgba(153, 102, 255, 1)',
+                      'rgba(255, 159, 64, 1)',
+                      'rgba(255, 199, 132, 1)',
+                      'rgba(54, 362, 235, 1)',
+                      'rgba(255, 806, 86, 1)',
+                      'rgba(75, 792, 192, 1)',
+                      'rgba(153, 602, 255, 1)',
+                      'rgba(255, 90, 64, 1)',
+                      'rgba(25, 999, 32, 1)',
+                      'rgba(54, 462, 35, 1)',
+                      'rgba(55, 806, 786, 1)',
+                      'rgba(75, 2, 92, 1)',
+                      'rgba(15, 10, 955, 1)',
+                      'rgba(2, 755, 664, 1)',
+                      'rgba(882, 9, 632, 1)',
+                      'rgba(554, 0, 835, 1)',
+                      'rgba(999, 80, 886, 1)',
+                      'rgba(705, 2, 492, 1)',
+                      'rgba(103, 602, 55, 1)',
+                    ],
+                      borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 199, 132, 1)',
+                        'rgba(54, 362, 235, 1)',
+                        'rgba(255, 806, 86, 1)',
+                        'rgba(75, 792, 192, 1)',
+                        'rgba(153, 602, 255, 1)',
+                        'rgba(255, 90, 64, 1)',
+                        'rgba(25, 999, 32, 1)',
+                        'rgba(54, 462, 35, 1)',
+                        'rgba(55, 806, 786, 1)',
+                        'rgba(75, 2, 92, 1)',
+                        'rgba(15, 10, 955, 1)',
+                        'rgba(2, 775, 664, 1)',
+                        'rgba(882, 9, 632, 1)',
+                        'rgba(554, 0, 835, 1)',
+                        'rgba(999, 80, 886, 1)',
+                        'rgba(705, 2, 492, 1)',
+                        'rgba(103, 602, 55, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 199, 132, 1)',
+                        'rgba(54, 362, 235, 1)',
+                        'rgba(255, 806, 86, 1)',
+                        'rgba(75, 792, 192, 1)',
+                        'rgba(153, 602, 255, 1)',
+                        'rgba(255, 90, 64, 1)',
+                        'rgba(25, 999, 32, 1)',
+                        'rgba(54, 462, 35, 1)',
+                        'rgba(55, 806, 786, 1)',
+                        'rgba(75, 2, 92, 1)',
+                        'rgba(15, 10, 955, 1)',
+                        'rgba(2, 775, 664, 1)',
+                        'rgba(882, 9, 632, 1)',
+                        'rgba(554, 0, 835, 1)',
+                        'rgba(999, 80, 886, 1)',
+                        'rgba(705, 2, 492, 1)',
+                        'rgba(103, 602, 55, 1)',
+                      ],
+                        borderWidth: 1
+                                          }]
+                                      },
+                  options: {
+                    scales: {
+                      yAxes: [{
+                        ticks: {
+                          beginAtZero: true
+                        }
+                      }]
+                    }
+                  }
+                                  });
+                </script>
+              </div>
+            </div>
+
+            <div class="col-md-12" style="margin-bottom: 110px;margin-top: 20px;">
+              <div class="bg-white">
+                <canvas id="myChart2" width="300" height="150"></canvas>
+                <script>
+                  var ctx = document.getElementById('myChart2').getContext('2d');
+                  var myChart2 = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                      labels: [{% for i in months %} '{{ i }}', {% endfor %}],
+                  //labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                  datasets: [{
+                    label: 'sales by month',
+                    data: [{% for i in totals %} {{ i }}, {% endfor %}],
+                    //data: [12, 19, 3, 5, 2, 3],
+
+                    backgroundColor: [
+                      'rgba(255, 99, 132, 1)',
+                      'rgba(54, 162, 235, 1)',
+                      'rgba(255, 206, 86, 1)',
+                      'rgba(75, 192, 192, 1)',
+                      'rgba(153, 102, 255, 1)',
+                      'rgba(255, 159, 64, 1)',
+                      'rgba(255, 199, 132, 1)',
+                      'rgba(54, 362, 235, 1)',
+                      'rgba(255, 806, 86, 1)',
+                      'rgba(75, 792, 192, 1)',
+                      'rgba(153, 602, 255, 1)',
+                      'rgba(255, 90, 64, 1)',
+                      'rgba(25, 999, 32, 1)',
+                      'rgba(54, 462, 35, 1)',
+                      'rgba(55, 806, 786, 1)',
+                      'rgba(75, 2, 92, 1)',
+                      'rgba(15, 10, 955, 1)',
+                      'rgba(2, 755, 664, 1)',
+                      'rgba(882, 9, 632, 1)',
+                      'rgba(554, 0, 835, 1)',
+                      'rgba(999, 80, 886, 1)',
+                      'rgba(705, 2, 492, 1)',
+                      'rgba(103, 602, 55, 1)',
+                      'rgba(255, 99, 132, 1)',
+                      'rgba(54, 162, 235, 1)',
+                      'rgba(255, 206, 86, 1)',
+                      'rgba(75, 192, 192, 1)',
+                      'rgba(153, 102, 255, 1)',
+                      'rgba(255, 159, 64, 1)',
+                      'rgba(255, 199, 132, 1)',
+                      'rgba(54, 362, 235, 1)',
+                      'rgba(255, 806, 86, 1)',
+                      'rgba(75, 792, 192, 1)',
+                      'rgba(153, 602, 255, 1)',
+                      'rgba(255, 90, 64, 1)',
+                      'rgba(25, 999, 32, 1)',
+                      'rgba(54, 462, 35, 1)',
+                      'rgba(55, 806, 786, 1)',
+                      'rgba(75, 2, 92, 1)',
+                      'rgba(15, 10, 955, 1)',
+                      'rgba(2, 755, 664, 1)',
+                      'rgba(882, 9, 632, 1)',
+                      'rgba(554, 0, 835, 1)',
+                      'rgba(999, 80, 886, 1)',
+                      'rgba(705, 2, 492, 1)',
+                      'rgba(103, 602, 55, 1)',
+                    ],
+                      borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 199, 132, 1)',
+                        'rgba(54, 362, 235, 1)',
+                        'rgba(255, 806, 86, 1)',
+                        'rgba(75, 792, 192, 1)',
+                        'rgba(153, 602, 255, 1)',
+                        'rgba(255, 90, 64, 1)',
+                        'rgba(25, 999, 32, 1)',
+                        'rgba(54, 462, 35, 1)',
+                        'rgba(55, 806, 786, 1)',
+                        'rgba(75, 2, 92, 1)',
+                        'rgba(15, 10, 955, 1)',
+                        'rgba(2, 775, 664, 1)',
+                        'rgba(882, 9, 632, 1)',
+                        'rgba(554, 0, 835, 1)',
+                        'rgba(999, 80, 886, 1)',
+                        'rgba(705, 2, 492, 1)',
+                        'rgba(103, 602, 55, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 199, 132, 1)',
+                        'rgba(54, 362, 235, 1)',
+                        'rgba(255, 806, 86, 1)',
+                        'rgba(75, 792, 192, 1)',
+                        'rgba(153, 602, 255, 1)',
+                        'rgba(255, 90, 64, 1)',
+                        'rgba(25, 999, 32, 1)',
+                        'rgba(54, 462, 35, 1)',
+                        'rgba(55, 806, 786, 1)',
+                        'rgba(75, 2, 92, 1)',
+                        'rgba(15, 10, 955, 1)',
+                        'rgba(2, 775, 664, 1)',
+                        'rgba(882, 9, 632, 1)',
+                        'rgba(554, 0, 835, 1)',
+                        'rgba(999, 80, 886, 1)',
+                        'rgba(705, 2, 492, 1)',
+                        'rgba(103, 602, 55, 1)',
+                      ],
+                        borderWidth: 1
+                                          }]
+                                      },
+                  options: {
+                    scales: {
+                      yAxes: [{
+                        ticks: {
+                          beginAtZero: true
+                        }
+                      }]
+                    }
+                  }
+                                  });
+                </script>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--End Graphs-->
+      
+      <div class="col-md-12" style="margin-bottom: 110px;margin-top: 20px;">
+        <h3>Top Selling Products</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr>
+              <th style="border: 1px solid #dddddd; background-color: #f2f2f2; text-align: left; padding: 8px;">Name</th>
+              <th style="border: 1px solid #dddddd; background-color: #f2f2f2; text-align: left; padding: 8px;">Product Code</th>
+              <th style="border: 1px solid #dddddd; background-color: #f2f2f2; text-align: left; padding: 8px;">Number of Sales</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in top_selling_products %}
+            <tr>
+                <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">{{ product.product__product_name }}</td>
+                <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">{{ product.product__product_id }}</td>
+                <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">{{ product.num_of_sales }}</td>
+            </tr>
+            {% endfor %}
+            <!-- Add more rows as needed -->
+        </tbody>
+        </table>
+      </div>
+
+      <div>
+        {% for i in  top_selling_categories%}
+        {{i}}
+        {% endfor %}
+      </div>
+
+      <!-- Optional JavaScript; choose one of the two! -->
+
+      <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
+      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+        crossorigin="anonymous"></script>
+
+      {% endblock %}
+    </div>
+
+  </div>
 
   <script src="{% static 'admin_static/libs/jquery/dist/jquery.min.js' %}"></script>
   <script src="{% static 'admin_static/libs/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
@@ -262,14 +649,15 @@
 
   <!-- altertify -->
 
-	<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
-	<script>
-		alertify.set('notifier','position', 'top-center');
-		{% for msg in messages %}
-	
-			alertify.success('{{msg}}');
-		{%endfor%}
-		 
-	</script>
+  <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+  <script>
+    alertify.set('notifier', 'position', 'top-center');
+    {% for msg in messages %}
+
+    alertify.success('{{msg}}');
+    {% endfor %}
+
+  </script>
 </body>
+
 </html>

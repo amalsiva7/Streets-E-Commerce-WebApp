@@ -14,5 +14,14 @@ urlpatterns = [
     
     path('order_list/', views.order_list, name='order_list'),
     path('ordered_product_details/<int:order_id>',views.ordered_product_details,name='ordered_product_details'),
-    path('update_order_status/<int:order_id>',views.update_order_status,name='update_order_status')
+    path('update_order_status/<int:order_id>',views.update_order_status,name='update_order_status'),
+    
+    
+    path("sales-report", views.sales_report, name="sales-report"),
+    path("sales-report-search", views.sales_report_search, name="sales-report-search"),
+    path("sales-date-search", views.sales_date_search, name="sales-date-search"),
+    path("sales-date-search", views.sales_date_search, name="sales-date-search"),
+    path('sales-report-pdf',views.sales_report_pdf, name="sales-report-pdf"),
+    path('sales-report-excel',views.sales_report_excel, name="sales-report-excel"),
+    
 ]

@@ -1,0 +1,28 @@
+{% autoescape off %}
+
+Dear {{ user.first_name }},
+
+Thank you for shopping with StreetS! We're thrilled to confirm your recent purchase. Here are the details of your order:
+
+Order Number: {{ order.order_number }}
+Order Date: {{ order_date }}
+Delivery Address: {{ delivery_address }}
+
+Order Summary:
+{% for item in ordered_products %}
+{{ item.product.product_name }} x {{ item.quantity }} - INR{{ item.product_price }}
+{% endfor %}
+Total Price (including Tax): INR {{ total_price }}
+
+Payment Method: {{ payment_method }}
+
+Your order will be processed shortly, and you'll receive another email once it's dispatched. If you have any questions or concerns regarding your order, feel free to reply to this email or contact our customer support team at amalsiva7210@gmail.com.
+
+Thank you for choosing StreetS. We appreciate your business and hope you enjoy your purchase!
+
+Best regards,
+
+Street$
+
+
+{% endautoescape %}

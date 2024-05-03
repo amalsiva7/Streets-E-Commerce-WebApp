@@ -1,0 +1,99 @@
+{% extends "user-side/base-footer.html" %}
+{% load static %}
+
+{% block content %}
+
+{% comment %} <div style="margin-top: 150px;"></div>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-danger text-white">
+          <h3 class="card-title">Your Wallet</h3>
+        </div>
+        <div class="card-body">
+          <div class="text-center">
+            <h3>Your Wallet Balance:</h3>
+            <h2 class="display-4">&#x20B9;{{ wallet_amount }}</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <div class="text-center">
+            <h3>Your Referral ID:</h3>
+            <h4>{{ referral_id }}</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div style="margin-top: 150px;"></div> {% endcomment %}
+
+
+<section class="section-padding footer-mid container" style="margin-top:100px; margin-bottom:280px;">
+  <div>
+      <h2 class="my-4">My Wallet</h2>
+  </div>
+  <div class="{% if Balance > 0 %}btn btn-success-light p-4 d-flex justify-content-start{% else %}btn btn-warning-light p-4 d-flex justify-content-start{% endif %}" style="width: 100%">
+      <div>
+          <span class="h1">{% if wallet_total > 0 %}&#8377; {{wallet_total}}{% else %}&#8377; 0.00{% endif %}</span><br>
+          
+          <span class="h6">Current Wallet Balance</span>
+      </div>
+  </div>
+  <div>
+      <h4 class="my-4">Transaction History</h4>
+  </div>
+  <div>
+      <table class="table">
+          <thead class="thead-light">
+              <tr>
+                  <th scope="col">Transaction ID</th>
+                  <th scope="col">Date and Time</th>
+                  <th scope="col">Description</th>
+                  <th scope="col">Amount</th>
+                  <th scope="col">Transaction Type</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% if transaction_history %}
+                  {% for transaction in transaction_history %}
+                      <tr class="{% if transaction.transaction_type == 'Credit' %}table-success{% else %}table-danger{% endif %}">
+                          <th scope="row"><span>{{ transaction.id }}</span></th>
+                          <td><span>{{ transaction.date }}</span></td>
+                          <td><span>{{ transaction.description }}</span></td>
+                          <td><span>{{ transaction.amount }}</span></td>
+                          <td><span>{{ transaction.transaction_type }}</span></td>
+                      </tr>
+                  {% endfor %}
+              {% endif %}
+          </tbody>
+      </table>
+      {% if transaction_history.has_other_pages %}
+      <div class="pagination justify-content-center">
+          <ul class="pagination">
+              {% if transaction_history.has_previous %}
+              <li class="page-item"><a class="page-link" href="?page=1">First</a></li>
+              <li class="page-item"><a class="page-link" href="?page={{ transaction_history.previous_page_number }}">Previous</a></li>
+              {% endif %}
+              {% for i in transaction_history.paginator.page_range %}
+              <li class="page-item{% if transaction_history.number == i %} active{% endif %}"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+              {% endfor %}
+              {% if transaction_history.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{ transaction_history.next_page_number }}">Next</a></li>
+              <li class="page-item"><a class="page-link" href="?page={{ transaction_history.paginator.num_pages }}">Last</a></li>
+              {% endif %}
+          </ul>
+      </div>
+      {% endif %}
+  </div>
+</section>
+
+{% endblock content %}

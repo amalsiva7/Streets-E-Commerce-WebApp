@@ -11,7 +11,8 @@
           <th>Product Name</th>
           <th>Quantity</th>
           <th>Price</th>
-          <th>Invoice</th>
+          <th>Order Status</th>
+          <th>Details</th>
           <!-- Add other order product-related columns as needed -->
         </tr>
       </thead>
@@ -22,7 +23,18 @@
           <td>{{ ordered_product.quantity }}</td>
           <td>&#x20B9;{{ ordered_product.product_price }}</td>
           <td>
+            {% if order.status == 'Delivered' %}
+            <a href="{% url 'wallet:return_order' order_id=order.id %}" class="btn btn-warning" onclick="return confirm('Are you sure you want to return this order?')">Return</a>
+            {% elif order.status != 'Returned' %}
+            {% if order.status != 'Cancelled' %}
+            <a href="{% url 'wallet:cancel_order' order_id=order.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this order?')">Cancel</a>
+            {% endif %}
+            {% endif %}
+          </td>
+          <td><a href="{% url 'user_side:ordered_product_details' order_id=order.id %}">View Details</a></td>
+          <td>
             <!-- Add a link to download the product invoice -->
+            
             <a href="{% url 'user_side:download_invoice' order.id %}" class="btn btn-primary">Download Invoice</a>
           </td>
           <!-- Add other order product-related data as needed -->

@@ -273,6 +273,8 @@ def product_page(request):
     price_range = request.GET.get('price_range')
     sort_by = request.GET.get('sort_by')
     search_query = request.GET.get('search_product')
+    cart_items_count = 0
+    wishlist_items_count = 0
 
     products = Product.objects.filter(is_active=True,productvariant__isnull=False).distinct()
 

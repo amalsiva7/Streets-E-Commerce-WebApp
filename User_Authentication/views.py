@@ -37,7 +37,10 @@ def index(request):
     all_products = Product.objects.filter(is_active=True)
     
     # Get 4 random products from the list of all products
-    random_products = sample(list(all_products), 4)
+    try:
+        random_products = sample(list(all_products), 4)
+    except:
+        random_products = []
     
     if request.user.is_authenticated:
         cart_items_count = CartItem.objects.filter(user=request.user, is_active=True).count()

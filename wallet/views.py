@@ -8,6 +8,10 @@ from cart.models import *
 from django.utils import timezone
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib import messages
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.shortcuts import render, redirect
 
 
 # Create your views here.
@@ -111,49 +115,94 @@ def wallet(request):
 
 
 @login_required(login_url='user_side:userlogin')
-def wallet_payment(request, order_id,coupon_code=None):
-      
-    id = request.user
-    order_main = Order.objects.get(id=order_id)
-    
-    print("Order_id :",order_id,"   Order_main total: ",order_main.order_total, "checking the values in wallet_payment function")
+def wallet_payment(request, order_id, coupon_code=None):
+    try:
+        # Correctly retrieve the user's email from the request
+        user_email = request.user.email
+        order_main = Order.objects.get(id=order_id)
+        
+        print("Order_id :", order_id, "   Order_main total: ", order_main.order_total, "checking the values in wallet_payment function")
 
-    user = Account.objects.get(email=id)
-    wallet_amount = wallet_balance(request, id)
-    
-    # Check if order_product exists before accessing its attributes
-    if order_main.order_total > wallet_amount:
-        print("Inside the Wallet payment function if wallet amount is less than order amount *********************************************")
-        messages.warning(request, "Insufficient Balance!")
-        return redirect("user_side:checkout")
+        # Retrieve the user's account using the email
+        user = Account.objects.get(email=user_email)
+        wallet_amount = wallet_balance(request, user.id)
+        
+        # Check if the order total exceeds the wallet balance
+        if order_main.order_total > wallet_amount:
+            messages.warning(request, "Insufficient Balance!")
+            return redirect("user_side:checkout")
 
-    order_main.payment_status = True
-    order_main.save()
+        # Mark the order as paid
+        order_main.payment_status = True
+        order_main.save()
 
-    if coupon_code is not None and coupon_code != "None":
-        coupon = Coupon.objects.get(coupon_code=coupon_code)
-        user = Account.objects.get(id=request.user.id)
-        User_Coupon.objects.create(
+        # Apply the coupon if provided
+        if coupon_code and coupon_code!= "None":
+            coupon = Coupon.objects.get(coupon_code=coupon_code)
+            User_Coupon.objects.create(
+                user=user,
+                coupon_code=coupon.coupon_code,
+                coupon_discount=coupon.discount,
+                order_id=order_main
+            )
+
+        # Update stock for each cart item
+        cart_items = CartItem.objects.filter(user=request.user)
+        for item in cart_items:
+            item.variations.stock -= item.quantity
+            item.variations.save()
+            orderproduct = OrderProduct()
+            orderproduct.order_id = order_main.id
+            orderproduct.user_id = request.user.id
+            orderproduct.product_id = item.product_id
+            orderproduct.quantity = item.quantity
+            orderproduct.product_price = item.product.price
+            orderproduct.ordered = True
+            orderproduct.save()
+
+        # Clear cart
+        cart_items.delete()
+
+        # Create a transaction record
+        Transaction.objects.create(
             user=user,
-            coupon_code=coupon.Coupon_code,
-            coupon_discount=coupon.discount,
-            order_id=order_main           
+            description=f"Placed Order {order_main.order_number}",
+            amount=order_main.order_total,
+            transaction_type="Debit",
         )
 
-    cart_ids = CartItem.objects.filter(user=id).values_list('cart', flat=True).distinct()
-    Transaction.objects.create(
-        user=user,
-        description="Placed Order  " + str(order_main.order_number),  #Convert order_id to string
-        amount=order_main.order_total,
-        transaction_type="Debit",
-    )
-    
-    # Clearing the cart after payment
-    data = Cart.objects.filter(id__in=cart_ids)  # Filtering carts based on retrieved IDs
-    data.delete()
+        # Send order confirmation email
+        mail_subject = 'Thank you for your order!'
+        message = render_to_string('user-side/order_received_email.html', {
+            'user': request.user,
+            'order': order_main,
+            'order_date': order_main.created_at,
+            'delivery_address': order_main.full_address(),
+            'ordered_products': OrderProduct.objects.filter(order=order_main),
+            'total_price': order_main.order_total,
+            'payment_method': 'Wallet',  # Assuming 'Wallet' is the payment method
+        })
+        to_email = request.user.email
+        email = EmailMessage(mail_subject, message, to=[to_email])
+        email.send()
 
+        # Prepare context for the order confirmation page
+        context = {
+            'order': order_main,
+            'ordered_products': OrderProduct.objects.filter(order=order_main),
+            'order_number': order_main.order_number,
+            'transID': None,  # Wallet transactions might not have a traditional transaction ID
+            'subtotal': order_main.order_total,
+            'payment_method': 'Wallet',
+            'coupon_discount': None,  # Assuming no coupon discount is applied
+        }
 
-    return render(request, "user-side/order_confirmed.html", {"order_id": order_id})
+        return render(request, "user-side/order_confirmed.html", context)
+    except Exception as e:
+        # Handle exceptions (e.g., order not found, database errors)
+        messages.error(request, "An error occurred during the payment process.")
+        return redirect("user_side:checkout")
+
   
 
 

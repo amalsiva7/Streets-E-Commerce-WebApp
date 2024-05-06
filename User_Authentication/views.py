@@ -789,7 +789,7 @@ def place_order(request, total=0, quantity=0):
             'cart_items': cart_items,
             'total': total,
             'tax': tax,
-            'grand_total': grand_total,
+            'grand_total': grand_total+delivery_charges,
             'coupons': coupons,
             'coupon_discount':coupon_discount,
             'delivery_charges':delivery_charges,

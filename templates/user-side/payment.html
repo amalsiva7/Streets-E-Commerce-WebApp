@@ -4,12 +4,12 @@
 {% block content %}
 {% if messages %}
 <div class="alert alert-dismissible fade show text-center" role="alert">
-  {% for message in messages %}
-  <div class="alert alert-{{ message.tags }} mx-auto" style="max-width: 400px;">
-    {{ message }}
-  </div>
-  {% endfor %}
-  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} mx-auto" style="max-width: 400px;">
+        {{ message }}
+    </div>
+    {% endfor %}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endif %}
 
@@ -52,7 +52,8 @@
                                             </div>
                                         </td>
                                         <td class="column-2">
-                                            <a href="{% url 'user_side:product_detail' product_id=cart_item.product.product_id %}" style="font-size: 13px; color: black;">
+                                            <a href="{% url 'user_side:product_detail' product_id=cart_item.product.product_id %}"
+                                                style="font-size: 13px; color: black;">
                                                 {{ cart_item.product.product_name }}
                                             </a>
                                         </td>
@@ -91,27 +92,27 @@
                         <div class="size-209" style="margin-top: 15px;">
                             <span class="mtext-110 cl2">&#x20B9;{{ delivery_charges }}</span>
                         </div>
-                        
+
                         <div class="size-208" style="margin-top: 15px;">
                             <span class="stext-110 cl2">Coupon Discount:</span>
                         </div>
+
                         <div class="size-209" style="margin-top: 15px;">
-                            <span class="mtext-110 cl2">&#x20B9;{{ discount_amount }}</span>
+                            <span class="mtext-110 cl2" id="discount-amt">&#x20B9; {{ discount_amount }}</span>
                         </div>
-                        
                     </div>
                     <div class="flex-w flex-t p-t-27 p-b-33">
                         <div class="size-208">
                             <span class="mtext-101 cl2">Grand Total:</span>
                         </div>
                         <div class="size-209 p-t-1">
-                            
-                            <span class="mtext-110 cl2">&#x20B9;{{ grand_total }}</span>
-                            
-                            
+
+                            <span class="mtext-110 cl2" id="grand_total">&#x20B9;{{ grand_total }}</span>
+
+
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
         </div>
@@ -122,53 +123,61 @@
         <div class="flex-w flex-sb-m bor15 p-t-18 p-b-15 p-lr-40 p-lr-15-sm" style="margin-top: -50px;">
             <div class="flex-w flex-m m-r-20 m-tb-5">
                 <div class="dropdown">
-                    <input class="stext-104 cl2 plh4 size-117 bor13 p-lr-20 m-r-10 m-tb-5" type="text" id="couponInput" placeholder="Coupon Code" data-toggle="dropdown" name="coupon_code" style="background-color:black; color: white;">
-                    <div class="dropdown-menu" id="couponList" style="display: none; max-height: 170px; overflow-y: auto; position: absolute; top: -200px;"> <!-- Adjust top value as needed -->
+                    <input class="stext-104 cl2 plh4 size-117 bor13 p-lr-20 m-r-10 m-tb-5" type="text" id="couponInput"
+                        placeholder="Coupon Code" data-toggle="dropdown" name="coupon_code"
+                        style="background-color:black; color: white;">
+                    <div class="dropdown-menu" id="couponList"
+                        style="display: none; max-height: 170px; overflow-y: auto; position: absolute; top: -200px;">
+                        <!-- Adjust top value as needed -->
                         <!-- Loop through the coupons and display them here -->
                         {% for coupon in coupons %}
-                            {% if not coupon.is_redeemed %}
-                                <a class="dropdown-item" data-coupon="{{ coupon.coupon_code }}" style="display: block; text-decoration: none; color: black;">
-                                    <div style="border: 1px solid #ccc; border-radius: 5px; padding: 10px; margin-bottom: 10px;">
-                                        <p style="margin: 0;"><strong>Coupon Code:</strong> {{ coupon.coupon_code }}</p>
-                                        <p style="margin: 0;"><strong>Discount:</strong> {{ coupon.coupon_discount }}%</p>
-                                        <p style="margin: 0;"><strong>Minimum Purchase:</strong> ₹{{ coupon.min_purchase }}</p>
-                                        <p style="margin: 0;"><strong>Expires on:</strong> {{ coupon.coupon_expiry }}</p>
-                                    </div>
-                                </a>
-                            {% endif %}
+                        {% if not coupon.is_redeemed %}
+                        <a class="dropdown-item" data-coupon="{{ coupon.coupon_code }}"
+                            style="display: block; text-decoration: none; color: black;">
+                            <div
+                                style="border: 1px solid #ccc; border-radius: 5px; padding: 10px; margin-bottom: 10px;">
+                                <p style="margin: 0;"><strong>Coupon Code:</strong> {{ coupon.coupon_code }}</p>
+                                <p style="margin: 0;"><strong>Discount:</strong> {{ coupon.coupon_discount }}%</p>
+                                <p style="margin: 0;"><strong>Minimum Purchase:</strong> ₹{{ coupon.min_purchase }}</p>
+                                <p style="margin: 0;"><strong>Expires on:</strong> {{ coupon.coupon_expiry }}</p>
+                            </div>
+                        </a>
+                        {% endif %}
                         {% endfor %}
                     </div>
                 </div>
             </div>
             <input type="hidden" name="order_id" value="{{ order.id }}">
-            <button id="applyCouponButton" class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5" type="button" style="background-color:black; color: white;">
+            <button id="applyCouponButton"
+                class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5" type="button"
+                style="background-color:black; color: white;">
                 Apply coupon
             </button>
         </div>
     </form>
-    
-    
-    
+
+
+
     <!-- Apply Coupon -->
-     
+
     <script>
         const couponInput = document.getElementById('couponInput');
         const couponList = document.getElementById('couponList');
         const applyCouponButton = document.getElementById('applyCouponButton');
-    
-        couponInput.addEventListener('focus', function() {
+
+        couponInput.addEventListener('focus', function () {
             couponList.style.display = 'block';
         });
-    
-        couponInput.addEventListener('blur', function() {
+
+        couponInput.addEventListener('blur', function () {
             setTimeout(() => {
                 couponList.style.display = 'none';
             }, 200); // Delay to allow time for the click event on the coupon list
         });
-    
+
         const couponItems = couponList.querySelectorAll('.dropdown-item');
-        couponItems.forEach(function(item) {
-            item.addEventListener('click', function(event) {
+        couponItems.forEach(function (item) {
+            item.addEventListener('click', function (event) {
                 event.preventDefault();
                 console.log('Coupon clicked:', this.getAttribute('data-coupon'));
                 couponInput.value = this.getAttribute('data-coupon');
@@ -176,7 +185,7 @@
                 couponList.style.display = 'none';
             });
         });
-    
+
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -191,25 +200,26 @@
             }
             return cookieValue;
         }
-    
-        applyCouponButton.addEventListener('click', function() {
+
+        applyCouponButton.addEventListener('click', function () {
             // Get the selected coupon code from the input field
             const selectedCouponCode = couponInput.value;
-    
+
             // Get the order ID from the hidden input field
             const orderId = document.querySelector('[name="order_id"]').value;
-    
+
             // Get the CSRF token from the cookie
             const csrftoken = getCookie('csrftoken');
-    
+
+
             // Log CSRF token for debugging
             console.log('CSRF Token:', csrftoken);
-    
+
             // Create a FormData object to send data to the server
             const formData = new FormData();
             formData.append('coupon_code', selectedCouponCode);
             formData.append('order_id', orderId);
-    
+
             // Send an AJAX request to apply the coupon
             fetch("{% url 'coupon:apply_coupon' %}", {
                 method: 'POST',
@@ -219,52 +229,66 @@
                 },
                 credentials: 'same-origin' // Include cookies in the request
             })
-            .then(response => {
-                console.log('--------------')
-                console.log(response)
-                if (response.ok) {
-                    // If the coupon is successfully applied, redirect to the payment page
-                    location.reload();
-                    console.log("helloow")
+                .then(data => {
+                    console.log('--------------')
+                    return data.json(); // Parse the JSON response
+                })
+                .then(response => {
+                    console.log('--------------')
+                    console.log(response)
+                    if (response) {
+                        console.log("helloow")
+                        location.reload();
+                        document.getElementById("discount-amt").innerText = response.discount_amount;
+                        document.getElementById("grand_total").innerText = response.total;
+                        // If the coupon is successfully applied, redirect to the payment page
+                        
 
-                } else {
-                    // If there's an error, display an error message to the user
-                    alert('Failed to apply coupon. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error applying coupon:', error);
-                alert('An error occurred while applying the coupon. Please try again later.');
-            });
+                    } else {
+                        // If there's an error, display an error message to the user
+                        alert('Failed to apply coupon. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error applying coupon:', error);
+                    alert('An error occurred while applying the coupon. Please try again later.');
+                });
         });
     </script>
-    
 
-    
+
+
 
     <div style="display: flex; justify-content: center;">
-        <button id="rzp-button1" style="background-color: #007BFF; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px;">Pay with Razorpay
+        <button id="rzp-button1"
+            style="background-color: #007BFF; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px;">Pay
+            with Razorpay
         </button>
     </div>
-    
+
 
     <input type="hidden" id="coupon-discount" value="0">
 
     <!-- Pay with Wallet -->
-<div style="display: flex; justify-content: center;">
-    <a href="{% url 'wallet:wallet_payment' order.id %}" id="payWithWalletBtn" class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5" style="background-color: #FF7F50;" onclick="return confirm('Are you sure you want to pay with wallet?')">
-        Pay with Wallet
-    </a>
-</div>
+    <div style="display: flex; justify-content: center;">
+        <a href="{% url 'wallet:wallet_payment' order.id %}" id="payWithWalletBtn"
+            class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5"
+            style="background-color: #FF7F50;" onclick="return confirm('Are you sure you want to pay with wallet?')">
+            Pay with Wallet
+        </a>
+    </div>
 
-<!-- Cash on Delivery -->
-<div style="display: flex; justify-content: center;">
-    <a href="{% url 'user_side:pay_with_cash_on_delivery' order.id %}" id="payWithWalletBtn" class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5" style="background-color: #FF7F50;" onclick="return confirm('Are you sure you want to pay with cash on delivery?')">
-        Cash on Delivery
-    </a>
-</div>
+    <!-- Cash on Delivery -->
+    <div style="display: flex; justify-content: center;">
+        <a href="{% url 'user_side:pay_with_cash_on_delivery' order.id %}" id="payWithWalletBtn"
+            class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5"
+            style="background-color: #FF7F50;"
+            onclick="return confirm('Are you sure you want to pay with cash on delivery?')">
+            Cash on Delivery
+        </a>
+    </div>
 
-  
+
 </form>
 
 
@@ -272,35 +296,35 @@
 
 <script>
     var payment_method = 'RazorPay'
-    var grandTotal = parseFloat("{{grand_total}}")*100;
+    var grandTotal = parseFloat("{{grand_total}}") * 100;
     var options = {
-    "key": "rzp_test_GbtyzPJXOB41tr", // Enter the Key ID generated from the Dashboard
-    "amount": grandTotal, // Amount is in currency subunits. Default currency is INR.
-    "currency": "INR",
-    "name": "StreetS",
-    "description": "Purchases",
-    "image": "https://example.com/your_logo",
-    "payment_id": "{{payment.id}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-    "handler": function (response){
-        //alert(response.razorpay_payment_id);
-        //alert(response.razorpay_order_id);
-        //alert(response.razorpay_signature)
-        console.log(response)
-        window.location.href = `/payment/payments/?order_id={{order.order_number}}&method=RAZORPAY&payment_id=${response.razorpay_payment_id}&payment_order_id=${response.razorpay_order_id}&payment_sign=${response.razorpay_signature}&status=COMPLETED&discount={{ coupon_discount }}`
-    },
+        "key": "rzp_test_GbtyzPJXOB41tr", // Enter the Key ID generated from the Dashboard
+        "amount": grandTotal, // Amount is in currency subunits. Default currency is INR.
+        "currency": "INR",
+        "name": "StreetS",
+        "description": "Purchases",
+        "image": "https://example.com/your_logo",
+        "payment_id": "{{payment.id}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+        "handler": function (response) {
+            //alert(response.razorpay_payment_id);
+            //alert(response.razorpay_order_id);
+            //alert(response.razorpay_signature)
+            console.log(response)
+            window.location.href = `/payment/payments/?order_id={{order.order_number}}&method=RAZORPAY&payment_id=${response.razorpay_payment_id}&payment_order_id=${response.razorpay_order_id}&payment_sign=${response.razorpay_signature}&status=COMPLETED&discount={{ coupon_discount }}`
+        },
 
-    "theme": {
-        "color": "#3399cc"
-    }
-};
-var rzp1 = new Razorpay(options);
-rzp1.on('payment.failed', function (response){
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    rzp1.on('payment.failed', function (response) {
         alert("Payment failed, please try other bank or another payment option");
-});
-document.getElementById('rzp-button1').onclick = function(e){
-    rzp1.open();
-    e.preventDefault();
-}
+    });
+    document.getElementById('rzp-button1').onclick = function (e) {
+        rzp1.open();
+        e.preventDefault();
+    }
 </script>
 
 

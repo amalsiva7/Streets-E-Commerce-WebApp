@@ -143,7 +143,7 @@ def wallet_payment(request, order_id,coupon_code=None):
     cart_ids = CartItem.objects.filter(user=id).values_list('cart', flat=True).distinct()
     Transaction.objects.create(
         user=user,
-        description="Placed Order  " + str(order_id),  #Convert order_id to string
+        description="Placed Order  " + str(order_main.order_number),  #Convert order_id to string
         amount=order_main.order_total,
         transaction_type="Debit",
     )

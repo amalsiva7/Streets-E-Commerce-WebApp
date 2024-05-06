@@ -17,6 +17,7 @@ from django.http import JsonResponse
 from django.utils import timezone
 from decimal import Decimal
 from Admin_panel.views import *
+from django.core.serializers import serialize
 
 # Create your views here.
 @login_required(login_url='admin_side:adminlogin')
@@ -143,28 +144,26 @@ def edit_coupon(request,id):
         "date_today":today_date
     }
     return render(request,'admin-side/edit_coupon.html',context)
-
+ 
 
 @login_required(login_url='user_side:userlogin')
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def apply_coupon(request):
-
+# @cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def  apply_coupon(request):
     if request.method == 'POST':
         coupon_code = request.POST.get('coupon_code')
         order_id = request.POST.get('order_id')
         print(coupon_code,order_id,"*****************************************************************************")
         
-
         try:
             coupon = get_object_or_404(Coupon, coupon_code=coupon_code)
             order = Order.objects.get(id=order_id)
             
             print(coupon,order,"***************************************************")
-
             if coupon.coupon_expiry >= timezone.now().date() and coupon.is_active:
                 if order.order_total >= coupon.min_purchase:
                     # Check if the coupon is already redeemed by the user
                     if coupon.is_redeemed_by_user(request.user):
+                        
                         messages.error(request, 'Coupon has already been redeemed by you.')
                         
                         
@@ -172,6 +171,8 @@ def apply_coupon(request):
                         # Calculate discount amount based on percentage
                         discount_percentage = Decimal(coupon.coupon_discount)
                         discount_amount = (discount_percentage / Decimal(100)) * Decimal(order.order_total)
+                        
+                        print("-----------------------------------------",discount_amount)
 
                         # Apply the discount and calculate updated total
                         updated_total = Decimal(order.order_total) - discount_amount
@@ -183,6 +184,8 @@ def apply_coupon(request):
 
                         # Mark the coupon as redeemed for the user
                         redeemed_details = User_Coupon.objects.create(user=request.user, coupon_code=coupon, is_redeemed=True)
+                        redeemed_details_json = serialize('json', [redeemed_details])
+                        
                         request.session['coupon_code'] = coupon_code
                         messages.success(request, 'Coupon applied successfully.')
                         # Redirect to payment page with updated order total
@@ -191,24 +194,22 @@ def apply_coupon(request):
                             'total': order.order_total,
                             'discount_amount': discount_amount,
                             'coupon':float(coupon.coupon_discount),
-                            'grand_total': updated_total,
-                            'redeemed_details':redeemed_details
+                            'grand_total': grand_total,
+                            'redeemed_details':redeemed_details_json
                         }
-                        
-                        
+                        print(context, 'hello what is really') 
                         return JsonResponse(context)
 
                 else:
                     messages.error(request, 'Coupon is not applicable for the order total.')
             else:
                 
-                
                 messages.error(request, 'Coupon is not applicable for the current date.')
+                
 
         except Coupon.DoesNotExist:
             
             messages.error(request, 'Invalid coupon code.')
-            
     return JsonResponse({'data':'Invalid request'})
     # Redirect back to the payment page if coupon application fails
     # return redirect('wallet:payment', order_id)

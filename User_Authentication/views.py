@@ -486,6 +486,84 @@ def edit_profile(request):
         return render(request, 'user-side/edit_profile.html', {'user_profile': user_profile})
 
 
+
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+# @login_required(login_url='user_side:userlogin')
+def forgot_password(request):
+    if request.method != "POST":
+        print("inside the not post ion forgot password **************************************************** ")
+        return render(request, "user-side/forgot_password.html")
+    else:
+        pass1 = request.POST["re_password"]
+        pass2 = request.POST["password"]
+        email=request.POST["email"]
+        if pass1 != pass2:
+            messages.warning(request, "password not correct")
+            return redirect("user-side/forgot_password.html")
+        
+        try:
+            user = Account.objects.get(email=email)
+        except ObjectDoesNotExist:
+            messages.warning(request, "your user email not available, plese enter a valid email")
+        request.session['email']=email
+        request.session['password']=pass1
+        return redirect('user_side:sent-otp-forgot-password')
+    
+  
+def sent_otp_forgot_password(request):
+    # Generate a random 4-digit OTP
+    random_num = random.randint(1000, 9999)
+    # Store the OTP in the session
+    request.session['OTP_Key'] = random_num
+    
+    # Fetch the user's name and email from the session
+    user_name = request.session.get('user_name')
+    # Compose the email message
+    email_subject = "Password Reset OTP"
+    email_body = f"""Dear {user_name},
+
+You've requested to reset your password for your [Website/App Name] account. Please use the following One-Time Password (OTP) to complete the process:
+
+OTP: {random_num}
+
+This OTP is valid for 60 seconds. Please do not share it with anyone for security reasons.
+
+If you did not initiate this request, please ignore this message.
+
+Thank you,
+[Your Company/Website Name] Team -OTP"""
+
+    # Send the email
+    send_mail(
+        email_subject,
+        email_body,
+        "amalsiva7210@gmail.com",
+        [request.session['email']],
+        fail_silently=False,
+    )
+    
+    # Redirect to the OTP verification page
+    return redirect('user_side:verify-otp-forgot-password')
+
+
+def verify_otp_forgot_password(request):
+   user=Account.objects.get(email=request.session['email'])
+   if request.method=="POST":
+      if str(request.session['OTP_Key']) != str(request.POST['otp']):
+         print(request.session['OTP_Key'],request.POST['otp'])
+        #  user.is_active=True
+      else:
+         password=request.session['password']
+         user.set_password(password)
+         user.save()
+         login(request,user)
+         messages.success(request, "password changed successfully!")
+         return redirect('user_side:userlogin')
+   return render(request,'user-side/verify_otp.html')
+
+
+
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @login_required(login_url='user_side:userlogin')
 def change_password(request):

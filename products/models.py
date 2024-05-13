@@ -23,6 +23,7 @@ class Product(models.Model):
     is_active = models.BooleanField(default=True)
     resale_price = models.IntegerField(null=True)
     modified_at = models.DateTimeField(auto_now=True)
+    rprice = models.IntegerField(null=True)
     
     def __str__(self):
         return self.product_name

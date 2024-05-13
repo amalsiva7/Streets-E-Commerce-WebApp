@@ -21,3 +21,13 @@ class Category(models.Model):
     
     def __str__(self):
         return self.category_name
+    
+
+class Offer(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    discount = models.DecimalField(max_digits=5, decimal_places=2)
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    def __str__(self):
+        return f"offer"

@@ -13,6 +13,7 @@ urlpatterns = [
   path("resend_otp",views.resend_otp,name="resend_otp"),
   
   
+  
   path('product_page',views.product_page, name='product_page'),
   path('product_detail/<int:product_id>/', views.product_detail, name='product_detail'),
   path('stock_check', views.stock_check, name='stock_check'),
@@ -29,7 +30,9 @@ urlpatterns = [
   path('delete_address/<int:address_id>/', views.delete_address, name='delete_address'),
   path('set_default_address/<int:address_id>/', views.set_default_address, name='set_default_address'), 
    
-  
+  path('forgot_password/', views.forgot_password, name='forgot_password'),
+  path('sent-otp-forgot-password/', views.sent_otp_forgot_password, name='sent-otp-forgot-password'),
+  path('verify-otp-forgot-password/', views.verify_otp_forgot_password, name='verify-otp-forgot-password'),
   path('change_password',views.change_password,name='change_password'),
   path('send_otp',views.change_password_send_otp,name='change_password_send_otp'),
   path('otp_verification',views.change_password_verify_otp,name='change_password_verify_otp'),

@@ -22,6 +22,10 @@ from coupon.models import *
 from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import razorpay
+from django.db.models import Case, When, Value, IntegerField
+from django.db.models import F, FloatField
+from django.db.models.functions import Cast,Abs
+
 
 # Create your views here.
 
@@ -277,6 +281,10 @@ def product_page(request):
     wishlist_items_count = 0
 
     products = Product.objects.filter(is_active=True,productvariant__isnull=False).distinct()
+   
+    
+    for p in products:
+        print(p.rprice,"***************************************************************RPRICE IN PRODUCT_PAGE****************************")
 
     if category_slug:
         # Filter products based on category
@@ -315,6 +323,10 @@ def product_page(request):
     if request.user.is_authenticated:
         cart_items_count = CartItem.objects.filter(user=request.user, is_active=True).count()
         wishlist_items_count = WishList.objects.filter(user=request.user).count()
+        
+    products = products.annotate(deducted_price=Cast(Abs(F('rprice') - F('price')), FloatField()))
+    
+        
 
     context = {
         'products': products,

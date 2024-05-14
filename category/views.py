@@ -123,10 +123,15 @@ def category_offer(request):
         dis = Offer(discount=(discount * 100), category=category, start_date=start_date, end_date=end_date)
         dis.save()
         product_list = Product.objects.filter(category=category)
+        
+        print(product_list,"*******************************************PRODUCT LIST IN CATEGORY OFFER********************************************")
+        
         for product in product_list:
-            product.discount = discount*100
-            product.rprice = product.price
-            product.price = product.rprice - round(product.rprice*discount,2)
+            discount_percent = dis.discount
+            price_float = float(product.price)
+            discount_percent_float = float(discount_percent)
+            discount_amount = (price_float *discount_percent_float) / 100
+            product.rprice = discount_amount
             product.save()
             
             
@@ -160,10 +165,24 @@ def edit_offer(request, offer_id):
     if request.method == 'POST':
         # Process the form data to update the offer
         offer.discount = float(request.POST.get('discount_percentage'))
-        
         offer.start_date = request.POST.get('start_date')
         offer.end_date = request.POST.get('end_date')
         offer.save()
+        
+        product_list = Product.objects.filter(category=offer.category)
+        
+        
+        
+        for product in product_list:
+            discount_percent = offer.discount
+            price_float = float(product.price)
+            discount_percent_float = float(discount_percent)
+            discount_amount = (price_float *discount_percent_float) / 100
+            product.rprice = discount_amount
+            product.save()
+            print(product.rprice,"*******************************************PRODUCT LIST RPRICE IN CATEGORY OFFER********************************************")
+        
+        
         return redirect('category_side:category_offer')
     
     categories = Category.objects.all()
@@ -187,8 +206,7 @@ def delete_offer(request, offer_id):
     if request.method == 'POST':
         product_list = Product.objects.filter(category=offer.category)
         for product in product_list:
-            product.discount = 0
-            product.price = product.rprice
+            product.rprice=0.00
             product.save()
         offer.delete()
         return redirect('category_side:category_offer') 

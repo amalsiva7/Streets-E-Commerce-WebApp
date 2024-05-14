@@ -243,9 +243,9 @@
                             </span>
                             {% else %}
                             <span class="stext-105 cl3">
-                                &#x20B9;{{product.price}}
+                                &#x20B9;{{product.deducted_price}}
                             </span>
-                            {% comment %} <del>&#x20B9;{{product.rprice}}</del> {% endcomment %}
+                            <del>&#x20B9;{{product.rprice}} off</del>
                             {% endif %}
                         </div>
                         {% if  request.user.is_authenticated %}

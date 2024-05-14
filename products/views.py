@@ -16,6 +16,8 @@ from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
 from django.db.models import Q
 from wishlist.models import *
 from cart.models import *
+from decimal import Decimal
+
 
 
 # Create your views here.
@@ -138,10 +140,19 @@ def add_product(request):
         try:
             brand = Brand.objects.get(id=brand_id)
             category = Category.objects.get(pk=category_id)
+            offer = Offer.objects.get(category=category)
+            discount_percent = offer.discount
+            price_float = float(price)
+            discount_percent_float = float(discount_percent)
+            discount_amount = (price_float *discount_percent_float) / 100 
+            
+            print(discount_amount,"**********************************************DISCOUNT CHECK IN THE ADD PRODUCT ADMIN SIDE**********************************************")
+            
+            
 
             # Attempt to create a new product
             product = Product(product_name=product_name, product_id=product_id, description=description, 
-                              category=category, price=price, brand=brand)
+                              category=category, price=price, brand=brand,rprice=discount_amount)
             product.image = images[0]
             product.save()
             

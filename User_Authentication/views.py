@@ -512,16 +512,21 @@ def forgot_password(request):
         pass1 = request.POST["re_password"]
         pass2 = request.POST["password"]
         email=request.POST["email"]
+        
         if pass1 != pass2:
             messages.warning(request, "password not correct")
-            return redirect("user-side/forgot_password.html")
+            # return redirect("user_side:forgot_password")
         
         try:
             user = Account.objects.get(email=email)
         except ObjectDoesNotExist:
             messages.warning(request, "your user email not available, plese enter a valid email")
-        request.session['email']=email
-        request.session['password']=pass1
+            return redirect("user_side:forgot_password")
+        
+        request.session['email'] = email
+        request.session['password'] = pass1
+        request.session['user_name'] = user.username
+        
         return redirect('user_side:sent-otp-forgot-password')
     
   
@@ -562,19 +567,36 @@ Thank you,
 
 
 def verify_otp_forgot_password(request):
-   user=Account.objects.get(email=request.session['email'])
-   if request.method=="POST":
-      if str(request.session['OTP_Key']) != str(request.POST['otp']):
-         print(request.session['OTP_Key'],request.POST['otp'])
-        #  user.is_active=True
-      else:
-         password=request.session['password']
-         user.set_password(password)
-         user.save()
-         login(request,user)
-         messages.success(request, "password changed successfully!")
-         return redirect('user_side:userlogin')
-   return render(request,'user-side/verify_otp.html')
+    email = request.session.get('email')
+
+    if not email:
+        messages.warning(request, "Session expired. Please try the password reset process again.")
+        return redirect('user_side:forgot_password')
+
+    try:
+        user = Account.objects.get(email=email)
+    except Account.DoesNotExist:
+        messages.warning(request, "User not found. Please try the password reset process again.")
+        return redirect('user_side:forgot_password')
+
+    if request.method == "POST":
+        if str(request.session.get('OTP_Key')) != str(request.POST.get('otp')):
+            messages.warning(request, "Incorrect OTP. Please try again.")
+            print(request.session['OTP_Key'], request.POST['otp'])
+        else:
+            password = request.session.get('password')
+            if password:
+                user.set_password(password)
+                user.save()
+                login(request, user)
+                messages.success(request, "Password changed successfully!")
+                return redirect('user_side:userlogin')
+            else:
+                messages.warning(request, "Session expired. Please try the password reset process again.")
+                return redirect('user_side:forgot_password')
+
+    return render(request, 'user-side/verify_otp.html')
+
 
 
 

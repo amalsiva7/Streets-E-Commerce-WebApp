@@ -325,7 +325,7 @@ def sales_date_search(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @superadmin_required
 def sales_report_pdf(request):
-    if not request.user.is_authenticated and request.user.is_superadmin:
+    if not request.user.is_authenticated or not request.user.is_superadmin:
         return redirect('admin_side:adminlogin')
 
     try:
@@ -333,7 +333,8 @@ def sales_report_pdf(request):
         end_date_str = request.GET.get('end_date')
     except:
         pass
-
+    
+    order = None
    
     #If both start_date and end_date are provided, filter data accordingly
     if start_date_str and end_date_str:
@@ -346,7 +347,7 @@ def sales_report_pdf(request):
         order = Order.objects.filter(date__range=[start_date_formatted, end_date_formatted])
     else:
        # If no dates provided, return all data
-        order_main_data = Order.objects.all()
+        order = Order.objects.all()
 
     context = {"order": order}
     html_content = render_to_string("admin-side/sales-report-pdf.html", context)

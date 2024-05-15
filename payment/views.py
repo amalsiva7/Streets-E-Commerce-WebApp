@@ -62,13 +62,15 @@ def payments(request):
         item.variations.stock -= item.quantity
         item.variations.save()
         orderproduct = OrderProduct()
-        orderproduct.order_id = order.id
+        orderproduct.order = order
         orderproduct.payment = payment
-        orderproduct.user_id = request.user.id
-        orderproduct.product_id = item.product_id
+        orderproduct.user = request.user
+        orderproduct.product = item.product
         orderproduct.quantity = item.quantity
         orderproduct.product_price = item.product.price
+        orderproduct.size = item.variations.size
         orderproduct.ordered = True
+        
         orderproduct.save()
 
     # Clear cart

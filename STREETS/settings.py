@@ -74,6 +74,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'User_Authentication.context_processor.count_num',
+                'coupon.context_processor.deducted_price', 
             ],
         },
     },

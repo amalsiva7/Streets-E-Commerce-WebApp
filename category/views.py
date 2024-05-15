@@ -180,9 +180,7 @@ def edit_offer(request, offer_id):
             discount_amount = (price_float *discount_percent_float) / 100
             product.rprice = discount_amount
             product.save()
-            print(product.rprice,"*******************************************PRODUCT LIST RPRICE IN CATEGORY OFFER********************************************")
-        
-        
+            
         return redirect('category_side:category_offer')
     
     categories = Category.objects.all()

@@ -279,9 +279,10 @@ def product_page(request):
     search_query = request.GET.get('search_product')
     cart_items_count = 0
     wishlist_items_count = 0
+    
+    print(category_slug,"*********************************************CATEGORY SLUG IN PRODUCT PAGE*********************************************")
 
-    products = Product.objects.filter(is_active=True,productvariant__isnull=False).distinct()
-   
+    products = Product.objects.filter(is_active=True,productvariant__isnull=False).distinct() 
     
     for p in products:
         print(p.rprice,"***************************************************************RPRICE IN PRODUCT_PAGE****************************")
@@ -325,7 +326,7 @@ def product_page(request):
         wishlist_items_count = WishList.objects.filter(user=request.user).count()
         
     products = products.annotate(deducted_price=Cast(Abs(F('rprice') - F('price')), FloatField()))
-    
+    # offer_discount = Offer.objects.filter('discount')
         
 
     context = {
@@ -334,7 +335,8 @@ def product_page(request):
         'price_range': price_range,
         'sort_by': sort_by,
         'cart_items_count':cart_items_count,
-        'wishlist_items_count':wishlist_items_count
+        'wishlist_items_count':wishlist_items_count,
+        # 'offer_discount':offer_discount
     }
     return render(request, 'user-side/product.html', context)
 

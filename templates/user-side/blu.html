@@ -48,10 +48,14 @@
                             {{products.product_name}}
                         </h4>
 
-                        <span class="mtext-106 cl2">
-                            &#x20B9;{{products.price}}
-                        </span>
-                        <p class="stext-102 cl3 p-t-23">
+                        {% for product_with_deducted_price in deducted_price %}
+                        {% if product_with_deducted_price.pk == products.pk %}
+                            <span class="mtext-106 cl2">
+                                &#x20B9;{{ product_with_deducted_price.deducted_price }}
+                            </span>
+                        {% endif %}
+                        {% endfor %}
+                               <p class="stext-102 cl3 p-t-23">
                             {{products.description}}
                         </p>
 

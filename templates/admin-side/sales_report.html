@@ -117,7 +117,7 @@
                 {% if  data.payment_status %}
                 <span class="badge alert-info">{{data.status}}</span>
                 {% else %}
-                <span class="badge alert-danger"style="color:black">PAYMENT PENDING</span>
+                <span class="badge alert-danger"style="color:black">{{data.payment.status}}</span>
                 {% endif %}
               </td>
               <td><h6 class="mb-4 small-text">{{ data.payment.payment_method|title }}</h6></td>
